@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgentMemory — Persistent Memory API for AI Agents</title>
+<title>Memstore — Persistent Memory API for AI Agents</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -199,19 +199,43 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
   .step-connector{display:none}
   .price-card.featured{transform:none}
 }
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border-bright);border-radius:16px;padding:40px;width:100%;max-width:440px;position:relative;transform:translateY(16px);transition:transform .25s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .15s}
+.modal-close:hover{color:var(--text)}
+.modal h3{font-size:22px;font-weight:600;margin-bottom:8px}
+.modal>div>p,.modal-sub{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6}
+.modal label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px}
+.modal input[type=email]{width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-size:15px;font-family:var(--font-body);outline:none;transition:border-color .2s;margin-bottom:16px}
+.modal input[type=email]:focus{border-color:var(--brand)}
+.modal-submit{width:100%;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .2s}
+.modal-submit:hover{background:#9080FF}
+.modal-submit:disabled{opacity:0.55;cursor:not-allowed}
+.modal-error{color:var(--red);font-size:13px;margin-top:-8px;margin-bottom:12px;display:none}
+.key-result{margin-top:4px}
+.key-warning{display:flex;align-items:center;gap:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--amber);margin-bottom:16px}
+.key-box{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.key-text{font-family:var(--font-mono);font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.key-copy{flex-shrink:0;background:var(--brand);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:background .2s;font-family:var(--font-body)}
+.key-copy:hover{background:#9080FF}
+.key-hint{font-size:12px;color:var(--dim)}
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="#" class="nav-logo"><span class="logo-dot"></span>agentmemory</a>
+  <a href="#" class="nav-logo"><span class="logo-dot"></span>memstore</a>
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#api">API</a>
     <a href="#pricing">Pricing</a>
     <a href="#" style="font-family:var(--font-mono);font-size:13px">Docs</a>
   </div>
-  <a href="#" class="nav-cta">Get API key</a>
+  <a href="#" class="nav-cta" onclick="openModal();return false;">Get API key</a>
 </nav>
 
 <!-- HERO -->
@@ -226,7 +250,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
       <h1>Your agents <em>finally</em><br>remember everything</h1>
       <p class="hero-sub">One REST API. Persistent semantic memory across every agent run. Stop losing context, stop re-explaining, stop hallucinating past decisions.</p>
       <div class="hero-actions">
-        <a href="#" class="btn-primary">Start for free &rarr;</a>
+        <a href="#" class="btn-primary" onclick="openModal();return false;">Start for free &rarr;</a>
         <a href="#api" class="btn-ghost">View the API</a>
       </div>
       <div class="trust-row">
@@ -242,12 +266,12 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
       <div class="browser">
         <div class="browser-bar">
           <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
-          <div class="url-bar">api.agentmemory.dev/v1/memory</div>
+          <div class="url-bar">api.memstore.dev/v1/memory</div>
         </div>
         <div class="code-split">
           <div class="code-panel">
             <div class="panel-label">Store a memory</div>
-            <pre><span class="kw">const</span> <span class="fn">res</span> = <span class="kw">await</span> fetch(<span class="str">'https://api.agentmemory.dev</span>
+            <pre><span class="kw">const</span> <span class="fn">res</span> = <span class="kw">await</span> fetch(<span class="str">'https://api.memstore.dev</span>
 <span class="str">  /v1/memory/remember'</span>, {
   <span class="key">method</span>: <span class="str">'POST'</span>,
   <span class="key">headers</span>: {
@@ -294,7 +318,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
       <div class="how-card">
         <span class="step-num">01</span>
         <h3>Remember</h3>
-        <p>POST any text — facts, decisions, user preferences, tool outputs. AgentMemory embeds it automatically and indexes it for semantic search.</p>
+        <p>POST any text — facts, decisions, user preferences, tool outputs. Memstore embeds it automatically and indexes it for semantic search.</p>
         <div class="step-connector"></div>
       </div>
       <div class="how-card">
@@ -414,7 +438,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
           <li>Semantic recall</li>
           <li>Session isolation</li>
         </ul>
-        <a href="#" class="plan-cta">Get started free</a>
+        <a href="#" class="plan-cta" onclick="openModal();return false;">Get started free</a>
       </div>
       <div class="price-card featured">
         <div class="featured-badge">Most Popular</div>
@@ -428,7 +452,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
           <li>Webhooks on update</li>
           <li>LLM-parseable errors</li>
         </ul>
-        <a href="#" class="plan-cta featured-cta">Start building &rarr;</a>
+        <a href="#" class="plan-cta featured-cta" onclick="openModal();return false;">Start building &rarr;</a>
       </div>
       <div class="price-card">
         <div class="plan-name">Pro</div>
@@ -455,12 +479,12 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
     <h2>Common questions</h2>
     <div class="faq-list">
       <div class="faq-item open">
-        <div class="faq-q" onclick="toggleFaq(this)">What frameworks does AgentMemory work with? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">Any framework that can make HTTP requests. LangGraph, CrewAI, AutoGen, custom MCP/A2A setups, plain Python, Node.js — if it can call a REST API, it works with AgentMemory. No framework-specific SDK required, though we ship optional ones for Python and Node.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">What frameworks does Memstore work with? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Any framework that can make HTTP requests. LangGraph, CrewAI, AutoGen, custom MCP/A2A setups, plain Python, Node.js — if it can call a REST API, it works with Memstore. No framework-specific SDK required, though we ship optional ones for Python and Node.</div></div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">How is this different from just using Supabase directly? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">AgentMemory handles embedding generation, index management, TTL enforcement, session scoping, memory summarization, and usage metering out of the box. Using Supabase raw requires you to wire all of that yourself — embedding model calls, vector index tuning, cleanup jobs. AgentMemory is the "it just works" layer so you ship your agent, not your infrastructure.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Memstore handles embedding generation, index management, TTL enforcement, session scoping, memory summarization, and usage metering out of the box. Using Supabase raw requires you to wire all of that yourself — embedding model calls, vector index tuning, cleanup jobs. Memstore is the "it just works" layer so you ship your agent, not your infrastructure.</div></div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">What embedding model does it use? <span class="faq-icon">+</span></div>
@@ -488,7 +512,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
     <div class="section-label">Get started</div>
     <h2>Give your agents<br>a memory worth keeping</h2>
     <p>Free tier. No credit card. First API key in 30 seconds.</p>
-    <a href="#" class="btn-primary" style="font-size:16px;padding:16px 40px">Get your free API key &rarr;</a>
+    <a href="#" class="btn-primary" style="font-size:16px;padding:16px 40px" onclick="openModal();return false;">Get your free API key &rarr;</a>
     <div class="trust-row" style="margin-top:32px">
       <div class="trust-item"><span>Free tier</span> no card required</div>
       <div class="trust-item"><span>5 min</span> integration</div>
@@ -497,8 +521,35 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
   </div>
 </section>
 
+<!-- SIGNUP MODAL -->
+<div class="modal-overlay" id="signupModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+    <div id="modalForm">
+      <h3>Get your free API key</h3>
+      <p class="modal-sub">Free tier — 1,000 ops/month. No credit card required.</p>
+      <label for="modalEmail">Email address</label>
+      <input type="email" id="modalEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')submitModal()">
+      <div id="modalError" class="modal-error"></div>
+      <button class="modal-submit" id="modalSubmit" onclick="submitModal()">Get API key &rarr;</button>
+    </div>
+    <div id="modalResult" style="display:none">
+      <h3>Your API key</h3>
+      <p class="modal-sub">Your key is ready. Add it as an <code style="font-family:var(--font-mono);color:var(--brand)">Authorization: Bearer</code> header on every request.</p>
+      <div class="key-result">
+        <div class="key-warning">&#9888; Save this key — it won't be shown again.</div>
+        <div class="key-box">
+          <span class="key-text" id="keyText"></span>
+          <button class="key-copy" id="copyBtn" onclick="copyKey()">Copy</button>
+        </div>
+        <div class="key-hint">Store it in an environment variable, e.g. <code style="font-family:var(--font-mono)">MEMSTORE_API_KEY</code></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
-  <div class="footer-logo"><span class="logo-dot"></span>agentmemory.dev</div>
+  <div class="footer-logo"><span class="logo-dot"></span>memstore.dev</div>
   <div class="footer-links">
     <a href="#">Docs</a>
     <a href="#">API Reference</a>
@@ -506,10 +557,11 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
     <a href="#">GitHub</a>
     <a href="#">Status</a>
   </div>
-  <div class="footer-legal">&copy; 2026 AgentMemory &middot; Privacy &middot; Terms</div>
+  <div class="footer-legal">&copy; 2026 Memstore &middot; Privacy &middot; Terms</div>
 </footer>
 
 <script>
+// ── FAQ accordion ──────────────────────────────────────────────
 function toggleFaq(el){
   const item=el.parentElement;
   const wasOpen=item.classList.contains('open');
@@ -517,7 +569,7 @@ function toggleFaq(el){
   if(!wasOpen)item.classList.add('open');
 }
 
-// staggered fade-in on scroll
+// ── Scroll fade-in ─────────────────────────────────────────────
 const observer=new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';observer.unobserve(e.target)}
@@ -527,6 +579,92 @@ document.querySelectorAll('.how-card,.feat,.price-card,.endpoint').forEach((el,i
   el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition=`opacity .4s ease ${i*0.06}s, transform .4s ease ${i*0.06}s`;
   observer.observe(el);
 });
+
+// ── Modal ──────────────────────────────────────────────────────
+function openModal(){
+  document.getElementById('signupModal').classList.add('open');
+  setTimeout(()=>document.getElementById('modalEmail').focus(),120);
+}
+
+function closeModal(){
+  document.getElementById('signupModal').classList.remove('open');
+  // reset state after transition finishes
+  setTimeout(()=>{
+    document.getElementById('modalForm').style.display='';
+    document.getElementById('modalResult').style.display='none';
+    document.getElementById('modalEmail').value='';
+    const err=document.getElementById('modalError');
+    err.style.display='none';err.textContent='';
+    const btn=document.getElementById('modalSubmit');
+    btn.disabled=false;btn.textContent='Get API key \u2192';
+  },300);
+}
+
+function closeModalOutside(e){
+  if(e.target===document.getElementById('signupModal'))closeModal();
+}
+
+async function submitModal(){
+  const emailEl=document.getElementById('modalEmail');
+  const email=emailEl.value.trim();
+  const err=document.getElementById('modalError');
+  // basic validation
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    err.textContent='Please enter a valid email address.';
+    err.style.display='block';
+    emailEl.focus();
+    return;
+  }
+  err.style.display='none';
+  const btn=document.getElementById('modalSubmit');
+  btn.disabled=true;btn.textContent='Creating your key…';
+  try{
+    const res=await fetch('/v1/agents',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:'My Agent',email})
+    });
+    const data=await res.json();
+    if(!res.ok){
+      err.textContent=data.message||'Something went wrong. Please try again.';
+      err.style.display='block';
+      btn.disabled=false;btn.textContent='Get API key \u2192';
+      return;
+    }
+    // success — show key
+    document.getElementById('keyText').textContent=data.api_key;
+    document.getElementById('modalForm').style.display='none';
+    document.getElementById('modalResult').style.display='block';
+  }catch(e){
+    err.textContent='Network error — please check your connection and try again.';
+    err.style.display='block';
+    btn.disabled=false;btn.textContent='Get API key \u2192';
+  }
+}
+
+let _copyTimer;
+function copyKey(){
+  const key=document.getElementById('keyText').textContent;
+  navigator.clipboard.writeText(key).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='Copied!';
+    clearTimeout(_copyTimer);
+    _copyTimer=setTimeout(()=>btn.textContent='Copy',2200);
+  }).catch(()=>{
+    // fallback for browsers without clipboard API
+    const ta=document.createElement('textarea');
+    ta.value=key;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='Copied!';
+    clearTimeout(_copyTimer);
+    _copyTimer=setTimeout(()=>btn.textContent='Copy',2200);
+  });
+}
+
+// close on Escape key
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 </script>
 </body>
 </html>
