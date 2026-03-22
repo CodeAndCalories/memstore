@@ -151,15 +151,15 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
     <div class="step">
       <div class="step-num">01</div>
       <div class="step-body">
-        <h3>Install dependencies</h3>
-        <p>You only need <code style="font-family:var(--font-mono);color:var(--brand)">requests</code> — no Memstore SDK required. LangChain and your LLM provider are already installed.</p>
+        <h3>Install the Memstore SDK</h3>
+        <p>Run <code style="font-family:var(--font-mono);color:var(--brand)">pip install memstore</code>. LangChain and your LLM provider are already installed.</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">02</div>
       <div class="step-body">
-        <h3>Write two helper functions</h3>
-        <p>One to store a memory, one to recall the most relevant ones for a given query. Both wrap a single <code style="font-family:var(--font-mono);color:var(--brand)">requests</code> call.</p>
+        <h3>Instantiate the client</h3>
+        <p>Create a <code style="font-family:var(--font-mono);color:var(--brand)">Memstore</code> instance with your API key. Use <code style="font-family:var(--font-mono);color:var(--brand)">ms.remember()</code> and <code style="font-family:var(--font-mono);color:var(--brand)">ms.recall()</code> anywhere in your agent.</p>
       </div>
     </div>
     <div class="step">
@@ -181,42 +181,23 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
   <h2>Full Python Example</h2>
 
   <div class="code-block">
-    <div class="code-label"><span class="code-label-text">memstore_helpers.py</span><span class="code-lang">Python</span></div>
-    <pre><span class="kw">import</span> requests
-<span class="kw">import</span> os
-
-_BASE = <span class="str">"https://memstore.dev/v1/memory"</span>
-_HEADERS = {
-    <span class="str">"Authorization"</span>: <span class="fn">f"Bearer {os.environ['MEMSTORE_API_KEY']}"</span>,
-    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
-}
-
-<span class="kw">def</span> <span class="fn">remember</span>(content: <span class="fn">str</span>, session: <span class="fn">str</span> = <span class="kw">None</span>) -> <span class="kw">None</span>:
-    payload = {<span class="str">"content"</span>: content}
-    <span class="kw">if</span> session:
-        payload[<span class="str">"session"</span>] = session
-    requests.post(<span class="fn">f"{_BASE}/remember"</span>, headers=_HEADERS, json=payload)
-
-<span class="kw">def</span> <span class="fn">recall</span>(query: <span class="fn">str</span>, session: <span class="fn">str</span> = <span class="kw">None</span>, limit: <span class="fn">int</span> = <span class="num">5</span>) -> list[<span class="fn">str</span>]:
-    params = {<span class="str">"q"</span>: query, <span class="str">"limit"</span>: limit}
-    <span class="kw">if</span> session:
-        params[<span class="str">"session"</span>] = session
-    res = requests.get(<span class="fn">f"{_BASE}/recall"</span>, headers=_HEADERS, params=params)
-    <span class="kw">return</span> [m[<span class="str">"content"</span>] <span class="kw">for</span> m <span class="kw">in</span> res.json().get(<span class="str">"memories"</span>, [])]</pre>
+    <div class="code-label"><span class="code-label-text">Install</span><span class="code-lang">bash</span></div>
+    <pre>pip install memstore</pre>
   </div>
 
   <div class="code-block">
     <div class="code-label"><span class="code-label-text">LangChain agent with persistent memory</span><span class="code-lang">Python</span></div>
     <pre><span class="kw">from</span> langchain.chat_models <span class="kw">import</span> ChatOpenAI
 <span class="kw">from</span> langchain.schema <span class="kw">import</span> SystemMessage, HumanMessage
-<span class="kw">from</span> memstore_helpers <span class="kw">import</span> remember, recall
+<span class="kw">from</span> memstore <span class="kw">import</span> Memstore
 
+ms = Memstore(api_key=<span class="str">"am_live_..."</span>)
 llm = ChatOpenAI(model=<span class="str">"gpt-4o-mini"</span>, temperature=<span class="num">0.3</span>)
 
 <span class="kw">def</span> <span class="fn">chat</span>(user_id: <span class="fn">str</span>, user_message: <span class="fn">str</span>) -> <span class="fn">str</span>:
     <span class="cmt"># 1. Recall relevant context</span>
-    memories = recall(user_message, session=user_id)
-    context = <span class="str">"\n"</span>.join(<span class="fn">f"- {m}"</span> <span class="kw">for</span> m <span class="kw">in</span> memories)
+    memories = ms.recall(user_message, session=user_id)
+    context = <span class="str">"\n"</span>.join(<span class="fn">f"- {m['content']}"</span> <span class="kw">for</span> m <span class="kw">in</span> memories)
 
     <span class="cmt"># 2. Build prompt with memory injected</span>
     system = <span class="fn">f"""You are a helpful assistant.
@@ -235,9 +216,9 @@ Use this context to give personalised, non-repetitive responses."""</span>
     response = llm(messages).content
 
     <span class="cmt"># 4. Store anything worth remembering</span>
-    remember(<span class="fn">f"User said: {user_message[:150]}"</span>, session=user_id)
+    ms.remember(<span class="fn">f"User said: {user_message[:150]}"</span>, session=user_id)
     <span class="kw">if</span> <span class="str">"prefer"</span> <span class="kw">in</span> user_message.lower() <span class="kw">or</span> <span class="str">"always"</span> <span class="kw">in</span> user_message.lower():
-        remember(user_message, session=user_id)  <span class="cmt"># store explicit preferences</span>
+        ms.remember(user_message, session=user_id)  <span class="cmt"># store explicit preferences</span>
 
     <span class="kw">return</span> response</pre>
   </div>
@@ -253,8 +234,9 @@ Use this context to give personalised, non-repetitive responses."""</span>
     <div class="code-label"><span class="code-label-text">LCEL chain with Memstore memory</span><span class="code-lang">Python</span></div>
     <pre><span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
 <span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
-<span class="kw">from</span> memstore_helpers <span class="kw">import</span> remember, recall
+<span class="kw">from</span> memstore <span class="kw">import</span> Memstore
 
+ms = Memstore(api_key=<span class="str">"am_live_..."</span>)
 prompt = ChatPromptTemplate.from_messages([
     (<span class="str">"system"</span>, <span class="str">"User context:\n{memory}\n\nBe concise and helpful."</span>),
     (<span class="str">"human"</span>, <span class="str">"{input}"</span>),
@@ -262,12 +244,12 @@ prompt = ChatPromptTemplate.from_messages([
 chain = prompt | ChatOpenAI(model=<span class="str">"gpt-4o-mini"</span>)
 
 <span class="kw">def</span> <span class="fn">invoke</span>(user_id: <span class="fn">str</span>, user_input: <span class="fn">str</span>) -> <span class="fn">str</span>:
-    memories = recall(user_input, session=user_id)
+    memories = ms.recall(user_input, session=user_id)
     result = chain.invoke({
-        <span class="str">"memory"</span>: <span class="str">"\n"</span>.join(memories) <span class="kw">or</span> <span class="str">"No prior context."</span>,
+        <span class="str">"memory"</span>: <span class="str">"\n"</span>.join(m[<span class="str">"content"</span>] <span class="kw">for</span> m <span class="kw">in</span> memories) <span class="kw">or</span> <span class="str">"No prior context."</span>,
         <span class="str">"input"</span>: user_input,
     })
-    remember(user_input, session=user_id)
+    ms.remember(user_input, session=user_id)
     <span class="kw">return</span> result.content</pre>
   </div>
 
