@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>LangChain Persistent Memory API (Simple Setup) — Memstore</title>
+<meta name="description" content="LangChain persistent memory between runs. Add long-term memory to LangChain agents with a simple REST API.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;--bg2:#0F0F1A;--bg3:#13131F;--surface:#161624;
+  --border:rgba(255,255,255,0.07);--border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;--muted:#8886A0;--dim:#4A4860;
+  --brand:#7B6EF6;--brand-dim:#3D3680;--brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;--amber:#F59E0B;--green:#34D399;--red:#F87171;
+  --radius:12px;--font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;--font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+.article-hero{padding:120px 40px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.article-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px}
+.article-hero h1{font-family:var(--font-display);font-size:clamp(36px,5vw,58px);font-weight:400;line-height:1.1;letter-spacing:-0.02em;max-width:820px;margin:0 auto 24px}
+.article-hero h1 em{font-style:italic;color:var(--brand)}
+.article-meta{font-size:14px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.article-wrap{max-width:740px;margin:0 auto;padding:0 40px 100px}
+.article-wrap h2{font-family:var(--font-display);font-size:clamp(26px,3.5vw,36px);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin:56px 0 16px;color:var(--text)}
+.article-wrap h3{font-size:20px;font-weight:600;margin:36px 0 12px;color:var(--text)}
+.article-wrap p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.article-wrap p strong{color:var(--text);font-weight:600}
+.article-wrap ul,.article-wrap ol{margin:0 0 20px 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.article-wrap ul li,.article-wrap ol li{font-size:16px;color:var(--muted);line-height:1.7;padding-left:24px;position:relative}
+.article-wrap ul li::before{content:'—';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono)}
+.article-wrap ol{counter-reset:ol-counter}
+.article-wrap ol li{counter-increment:ol-counter}
+.article-wrap ol li::before{content:counter(ol-counter)'.';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono);font-size:13px}
+.code-block{background:var(--surface);border:1px solid rgba(123,110,246,0.35);border-radius:var(--radius);overflow:hidden;margin:24px 0}
+.code-label{background:var(--bg3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.code-label-text{font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase}
+.code-lang{font-size:11px;font-family:var(--font-mono);color:var(--brand);letter-spacing:0.06em}
+.code-block pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted)}
+.code-block pre .kw{color:#C084FC}.code-block pre .str{color:#86EFAC}
+.code-block pre .key{color:#93C5FD}.code-block pre .cmt{color:var(--dim)}
+.code-block pre .fn{color:#67E8F9}.code-block pre .num{color:#FCD34D}
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:20px 24px;margin:28px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+.problem-box{background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius);padding:20px 24px;margin:20px 0}
+.problem-box p{color:var(--muted);font-size:15px;margin:0}
+.problem-box strong{color:var(--red)}
+.step-list{display:flex;flex-direction:column;gap:24px;margin:28px 0}
+.step{display:flex;gap:20px;align-items:flex-start}
+.step-num{font-family:var(--font-mono);font-size:24px;font-weight:500;color:var(--brand-dim);flex-shrink:0;line-height:1.2;width:32px}
+.step-body h3{font-size:17px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.step-body p{font-size:15px;color:var(--muted);line-height:1.65;margin:0}
+.article-wrap hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.further-reading{margin-top:48px}
+.further-reading h3{font-size:16px;font-weight:600;margin-bottom:16px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font-mono)}
+.reading-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:8px}
+.reading-list li::before{display:none}
+.reading-list a{font-size:15px;color:var(--brand);text-decoration:none;padding-left:0}
+.reading-list a:hover{text-decoration:underline}
+.article-cta{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;margin:64px 0 0}
+.article-cta h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;margin-bottom:12px}
+.article-cta p{color:var(--muted);font-size:16px;margin-bottom:28px}
+.btn-primary{display:inline-block;background:var(--brand);color:#fff;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#9080FF;transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,110,246,0.35)}
+footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+@media(max-width:768px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .article-hero{padding:100px 20px 48px}.article-wrap{padding:0 20px 64px}
+  .article-cta{padding:36px 24px}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<div class="article-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="article-eyebrow">Docs &middot; LangChain</div>
+    <h1>LangChain Persistent Memory API<br><em>(Simple Setup)</em></h1>
+    <div class="article-meta">
+      <span>8 min read</span>
+      <span>&middot;</span>
+      <span>LangChain &middot; Python &middot; REST API</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-wrap">
+
+  <h2>LangChain Memory Is Temporary by Default</h2>
+  <p>LangChain's built-in memory classes — <code style="font-family:var(--font-mono);color:var(--brand)">ConversationBufferMemory</code>, <code style="font-family:var(--font-mono);color:var(--brand)">ConversationSummaryMemory</code>, and friends — are all in-process. The moment your script ends, your Lambda function returns, or your container restarts, every memory is gone.</p>
+
+  <div class="problem-box">
+    <p><strong>What this means in practice:</strong> your LangChain agent has no idea it already talked to this user. It can't remember the user's preferences, their project context, or decisions made in prior sessions. Every run starts from zero.</p>
+  </div>
+
+  <p>The fix is simple: stop relying on in-process memory classes and start writing important facts to an external store after each run — and reading them back at the start of the next one. Memstore gives you this in two REST calls, with no infrastructure to manage.</p>
+
+  <h2>Quick Test — curl First</h2>
+  <p>Get your free API key at <a href="https://memstore.dev" style="color:var(--brand)">memstore.dev</a> and verify the API works before touching any LangChain code:</p>
+
+  <div class="code-block">
+    <div class="code-label"><span class="code-label-text">Store a memory</span><span class="code-lang">curl</span></div>
+    <pre><span class="fn">curl</span> -X POST https://memstore.dev/v1/memory/remember \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{"content": "User is building a fintech app, prefers Python"}'</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label"><span class="code-label-text">Recall across runs</span><span class="code-lang">curl</span></div>
+    <pre><span class="fn">curl</span> <span class="str">"https://memstore.dev/v1/memory/recall?q=user+background"</span> \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span>
+
+<span class="cmt"># Returns: {"memories":[{"content":"User is building a fintech app...","score":0.94}]}</span></pre>
+  </div>
+
+  <h2>Step-by-Step LangChain Integration</h2>
+
+  <div class="step-list">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <h3>Install dependencies</h3>
+        <p>You only need <code style="font-family:var(--font-mono);color:var(--brand)">requests</code> — no Memstore SDK required. LangChain and your LLM provider are already installed.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <h3>Write two helper functions</h3>
+        <p>One to store a memory, one to recall the most relevant ones for a given query. Both wrap a single <code style="font-family:var(--font-mono);color:var(--brand)">requests</code> call.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <h3>Recall before building the prompt</h3>
+        <p>At the start of each chain or agent invocation, fetch the most relevant memories and inject them into your system message.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <h3>Store after the run</h3>
+        <p>After the chain returns, persist anything worth remembering — the user's question, key facts surfaced, decisions made.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Full Python Example</h2>
+
+  <div class="code-block">
+    <div class="code-label"><span class="code-label-text">memstore_helpers.py</span><span class="code-lang">Python</span></div>
+    <pre><span class="kw">import</span> requests
+<span class="kw">import</span> os
+
+_BASE = <span class="str">"https://memstore.dev/v1/memory"</span>
+_HEADERS = {
+    <span class="str">"Authorization"</span>: <span class="fn">f"Bearer {os.environ['MEMSTORE_API_KEY']}"</span>,
+    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
+}
+
+<span class="kw">def</span> <span class="fn">remember</span>(content: <span class="fn">str</span>, session: <span class="fn">str</span> = <span class="kw">None</span>) -> <span class="kw">None</span>:
+    payload = {<span class="str">"content"</span>: content}
+    <span class="kw">if</span> session:
+        payload[<span class="str">"session"</span>] = session
+    requests.post(<span class="fn">f"{_BASE}/remember"</span>, headers=_HEADERS, json=payload)
+
+<span class="kw">def</span> <span class="fn">recall</span>(query: <span class="fn">str</span>, session: <span class="fn">str</span> = <span class="kw">None</span>, limit: <span class="fn">int</span> = <span class="num">5</span>) -> list[<span class="fn">str</span>]:
+    params = {<span class="str">"q"</span>: query, <span class="str">"limit"</span>: limit}
+    <span class="kw">if</span> session:
+        params[<span class="str">"session"</span>] = session
+    res = requests.get(<span class="fn">f"{_BASE}/recall"</span>, headers=_HEADERS, params=params)
+    <span class="kw">return</span> [m[<span class="str">"content"</span>] <span class="kw">for</span> m <span class="kw">in</span> res.json().get(<span class="str">"memories"</span>, [])]</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label"><span class="code-label-text">LangChain agent with persistent memory</span><span class="code-lang">Python</span></div>
+    <pre><span class="kw">from</span> langchain.chat_models <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> langchain.schema <span class="kw">import</span> SystemMessage, HumanMessage
+<span class="kw">from</span> memstore_helpers <span class="kw">import</span> remember, recall
+
+llm = ChatOpenAI(model=<span class="str">"gpt-4o-mini"</span>, temperature=<span class="num">0.3</span>)
+
+<span class="kw">def</span> <span class="fn">chat</span>(user_id: <span class="fn">str</span>, user_message: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    <span class="cmt"># 1. Recall relevant context</span>
+    memories = recall(user_message, session=user_id)
+    context = <span class="str">"\n"</span>.join(<span class="fn">f"- {m}"</span> <span class="kw">for</span> m <span class="kw">in</span> memories)
+
+    <span class="cmt"># 2. Build prompt with memory injected</span>
+    system = <span class="fn">f"""You are a helpful assistant.
+
+What you remember about this user:
+{context or "Nothing yet — this may be their first message."}
+
+Use this context to give personalised, non-repetitive responses."""</span>
+
+    messages = [
+        SystemMessage(content=system),
+        HumanMessage(content=user_message),
+    ]
+
+    <span class="cmt"># 3. Run the chain</span>
+    response = llm(messages).content
+
+    <span class="cmt"># 4. Store anything worth remembering</span>
+    remember(<span class="fn">f"User said: {user_message[:150]}"</span>, session=user_id)
+    <span class="kw">if</span> <span class="str">"prefer"</span> <span class="kw">in</span> user_message.lower() <span class="kw">or</span> <span class="str">"always"</span> <span class="kw">in</span> user_message.lower():
+        remember(user_message, session=user_id)  <span class="cmt"># store explicit preferences</span>
+
+    <span class="kw">return</span> response</pre>
+  </div>
+
+  <div class="callout">
+    <strong>Session scoping tip:</strong> pass a <code style="font-family:var(--font-mono)">session</code> parameter equal to your user's ID. This isolates one user's memories from another's — no cross-contamination even when thousands of users share the same API key.
+  </div>
+
+  <h2>Using LangChain Chains (LCEL)</h2>
+  <p>If you're using LangChain Expression Language, wrap your chain invocation with the same recall-before / store-after pattern:</p>
+
+  <div class="code-block">
+    <div class="code-label"><span class="code-label-text">LCEL chain with Memstore memory</span><span class="code-lang">Python</span></div>
+    <pre><span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> memstore_helpers <span class="kw">import</span> remember, recall
+
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="str">"system"</span>, <span class="str">"User context:\n{memory}\n\nBe concise and helpful."</span>),
+    (<span class="str">"human"</span>, <span class="str">"{input}"</span>),
+])
+chain = prompt | ChatOpenAI(model=<span class="str">"gpt-4o-mini"</span>)
+
+<span class="kw">def</span> <span class="fn">invoke</span>(user_id: <span class="fn">str</span>, user_input: <span class="fn">str</span>) -> <span class="fn">str</span>:
+    memories = recall(user_input, session=user_id)
+    result = chain.invoke({
+        <span class="str">"memory"</span>: <span class="str">"\n"</span>.join(memories) <span class="kw">or</span> <span class="str">"No prior context."</span>,
+        <span class="str">"input"</span>: user_input,
+    })
+    remember(user_input, session=user_id)
+    <span class="kw">return</span> result.content</pre>
+  </div>
+
+  <h2>Why Not Use LangChain's Built-in Memory?</h2>
+  <ul>
+    <li><strong>It's ephemeral</strong> — lost on every restart, deploy, or timeout</li>
+    <li><strong>It doesn't scale</strong> — in-memory state can't be shared across multiple workers or Lambda instances</li>
+    <li><strong>It stuffs the context window</strong> — ConversationBufferMemory dumps the full history, blowing up token costs</li>
+    <li><strong>Memstore is semantic</strong> — recall returns only the <em>relevant</em> memories, not everything ever stored</li>
+  </ul>
+
+  <div class="article-cta">
+    <h2>Add persistent memory to LangChain</h2>
+    <p>Free tier — 1,000 ops/month. No credit card. Works in 10 minutes.</p>
+    <a href="https://memstore.dev" class="btn-primary">Get your API key &rarr;</a>
+  </div>
+
+  <hr>
+
+  <div class="further-reading">
+    <h3>Further Reading</h3>
+    <ul class="reading-list">
+      <li><a href="/docs/persistent-memory-ai-agents.html">Persistent Memory for AI Agents: Full Guide</a></li>
+      <li><a href="/docs/crewai-memory-between-runs.html">CrewAI Agent Memory Between Runs</a></li>
+      <li><a href="/quickstart.html">Quickstart — First memory in 5 minutes</a></li>
+      <li><a href="/guide.html">Full Memstore Guide</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><img src="/logo.svg" alt="memstore" height="28"></div>
+  <div class="footer-links">
+    <a href="https://memstore.dev">Home</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guide</a>
+    <a href="/docs/persistent-memory-ai-agents.html">Docs</a>
+  </div>
+  <div class="footer-legal">&copy; 2026 Memstore</div>
+</footer>
+
+</body>
+</html>
