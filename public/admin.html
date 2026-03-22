@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memstore Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;--bg2:#0F0F1A;--bg3:#13131F;--surface:#161624;
+  --border:rgba(255,255,255,0.07);--border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;--muted:#8886A0;--dim:#4A4860;
+  --brand:#7B6EF6;--brand-glow:rgba(123,110,246,0.15);
+  --green:#34D399;--amber:#F59E0B;--red:#F87171;--teal:#2DD4BF;
+  --radius:12px;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.5}
+
+/* lock screen */
+#lock-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.lock-card{background:var(--surface);border:1px solid var(--border-bright);border-radius:16px;padding:40px;width:100%;max-width:360px;text-align:center}
+.lock-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;margin-bottom:28px;display:flex;align-items:center;justify-content:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block}
+.lock-card h2{font-size:20px;font-weight:600;margin-bottom:6px}
+.lock-card p{font-size:14px;color:var(--muted);margin-bottom:24px}
+.lock-card input{width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-size:15px;font-family:var(--font-body);outline:none;transition:border-color .2s;margin-bottom:12px}
+.lock-card input:focus{border-color:var(--brand)}
+.lock-card button{width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:background .2s}
+.lock-card button:hover{background:#9080FF}
+.lock-error{color:var(--red);font-size:13px;margin-top:10px;min-height:18px}
+
+/* top bar */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.header-logo{font-family:var(--font-mono);font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px;color:var(--text)}
+.header-badge{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);color:var(--brand);font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;letter-spacing:0.06em;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:16px}
+.btn-logout{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .2s}
+.btn-logout:hover{border-color:var(--border-bright);color:var(--text)}
+
+/* main layout */
+main{padding:32px}
+.page-title{font-size:22px;font-weight:600;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+
+/* stat cards */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px}
+.stat-label{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.stat-value{font-family:var(--font-mono);font-size:28px;font-weight:500;color:var(--text);line-height:1}
+.stat-sub{font-size:12px;color:var(--dim);margin-top:6px}
+
+/* table */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-size:14px;font-weight:600}
+.table-count{font-size:13px;color:var(--muted)}
+.btn-refresh{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-size:13px;cursor:pointer;font-family:var(--font-body);transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-refresh:hover{border-color:var(--border-bright);color:var(--text)}
+.btn-refresh.loading{opacity:0.55;cursor:not-allowed}
+
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--bg3)}
+th{text-align:left;padding:11px 16px;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13px;color:var(--muted);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,0.02)}
+
+.email-cell{color:var(--text);font-weight:500}
+.prefix-cell{font-family:var(--font-mono);font-size:12px;color:var(--brand)}
+
+/* plan badges */
+.plan-badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
+.plan-free{background:rgba(74,72,96,0.4);color:var(--muted)}
+.plan-starter{background:rgba(123,110,246,0.15);color:var(--brand)}
+.plan-pro{background:rgba(45,212,191,0.12);color:var(--teal)}
+
+/* ops bar */
+.ops-wrap{display:flex;flex-direction:column;gap:5px;min-width:120px}
+.ops-bar-track{height:4px;background:var(--border);border-radius:99px;overflow:hidden}
+.ops-bar-fill{height:100%;border-radius:99px;background:var(--brand);transition:width .3s}
+.ops-bar-fill.warn{background:var(--amber)}
+.ops-bar-fill.full{background:var(--red)}
+.ops-text{font-size:12px;color:var(--muted);font-family:var(--font-mono)}
+
+/* date */
+.date-cell{font-size:12px;color:var(--dim);white-space:nowrap}
+
+/* empty / error state */
+.table-empty{padding:48px;text-align:center;color:var(--dim);font-size:14px}
+.table-error{padding:24px;text-align:center;color:var(--red);font-size:14px;background:rgba(248,113,113,0.05)}
+
+/* loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--bg3) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;height:14px;display:inline-block}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  main{padding:20px}
+  header{padding:0 20px}
+  th:nth-child(4),td:nth-child(4){display:none}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  th:nth-child(5),td:nth-child(5){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo"><span class="logo-dot"></span>memstore</div>
+    <h2>Admin Dashboard</h2>
+    <p>Enter the admin password to continue.</p>
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+    <button onclick="unlock()">Unlock &rarr;</button>
+    <div class="lock-error" id="lock-error"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
+
+  <header>
+    <div class="header-logo">
+      <span class="logo-dot"></span>memstore
+      <span class="header-badge">Admin</span>
+    </div>
+    <div class="header-right">
+      <span id="last-refreshed" style="font-size:12px;color:var(--dim)"></span>
+      <button class="btn-logout" onclick="logout()">Log out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-title">Agents</div>
+    <div class="page-sub">All registered agents and their usage.</div>
+
+    <!-- Stat cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Agents</div>
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-sub">all time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Free Plan</div>
+        <div class="stat-value" id="stat-free">—</div>
+        <div class="stat-sub">agents</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Paid Plans</div>
+        <div class="stat-value" id="stat-paid">—</div>
+        <div class="stat-sub">starter + pro</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Ops Used</div>
+        <div class="stat-value" id="stat-ops">—</div>
+        <div class="stat-sub">across all agents</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">All Agents</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="table-count" id="table-count"></span>
+          <button class="btn-refresh" id="refresh-btn" onclick="loadAgents()">
+            <span id="refresh-icon">↻</span> Refresh
+          </button>
+        </div>
+      </div>
+      <div id="table-body">
+        <div class="table-empty">Loading…</div>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────
+const ADMIN_PASSWORD = 'memstore-admin-2025'; // change this
+const SESSION_KEY    = 'ms_admin_token';
+
+// ── Auth ──────────────────────────────────────────────────────
+function unlock() {
+  const val = document.getElementById('pw-input').value.trim();
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, val);
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display   = 'block';
+    loadAgents();
+  } else {
+    document.getElementById('lock-error').textContent = 'Incorrect password.';
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-input').focus();
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+
+// Allow Enter key on password field
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') unlock();
+  document.getElementById('lock-error').textContent = '';
+});
+
+// Auto-unlock if session still valid
+if (sessionStorage.getItem(SESSION_KEY) === ADMIN_PASSWORD) {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display   = 'block';
+  loadAgents();
+}
+
+// ── Data loading ──────────────────────────────────────────────
+async function loadAgents() {
+  const btn = document.getElementById('refresh-btn');
+  const icon = document.getElementById('refresh-icon');
+  btn.classList.add('loading');
+  icon.textContent = '…';
+
+  try {
+    const res = await fetch('/v1/admin/agents', {
+      headers: { 'Authorization': `Bearer ${sessionStorage.getItem(SESSION_KEY)}` }
+    });
+
+    if (res.status === 401) {
+      renderError('Unauthorized — check ADMIN_TOKEN matches the session password.');
+      return;
+    }
+
+    const json = await res.json();
+    if (!res.ok) { renderError(json.message || 'Server error'); return; }
+
+    renderStats(json.agents);
+    renderTable(json.agents);
+
+    const now = new Date();
+    document.getElementById('last-refreshed').textContent =
+      'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  } catch (err) {
+    renderError('Network error: ' + err.message);
+  } finally {
+    btn.classList.remove('loading');
+    icon.textContent = '↻';
+  }
+}
+
+// ── Stats ─────────────────────────────────────────────────────
+function renderStats(agents) {
+  document.getElementById('stat-total').textContent = agents.length;
+  document.getElementById('stat-free').textContent  = agents.filter(a => a.plan === 'free').length;
+  document.getElementById('stat-paid').textContent  = agents.filter(a => a.plan !== 'free').length;
+  const totalOps = agents.reduce((s, a) => s + (a.ops_used || 0), 0);
+  document.getElementById('stat-ops').textContent   = totalOps.toLocaleString();
+}
+
+// ── Table ─────────────────────────────────────────────────────
+function renderTable(agents) {
+  const container = document.getElementById('table-body');
+  document.getElementById('table-count').textContent = agents.length + ' total';
+
+  if (!agents.length) {
+    container.innerHTML = '<div class="table-empty">No agents yet.</div>';
+    return;
+  }
+
+  const rows = agents.map(a => {
+    const pct   = Math.min(100, Math.round((a.ops_used || 0) / (a.ops_limit || 1000) * 100));
+    const cls   = pct >= 100 ? 'full' : pct >= 75 ? 'warn' : '';
+    const badge = `plan-${a.plan}`;
+    const date  = new Date(a.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+
+    return `
+      <tr>
+        <td class="email-cell">${esc(a.owner_email || '—')}</td>
+        <td class="email-cell" style="color:var(--muted);font-weight:400">${esc(a.name || '—')}</td>
+        <td><span class="plan-badge ${badge}">${esc(a.plan)}</span></td>
+        <td>
+          <div class="ops-wrap">
+            <div class="ops-text">${(a.ops_used||0).toLocaleString()} / ${(a.ops_limit||0).toLocaleString()}</div>
+            <div class="ops-bar-track"><div class="ops-bar-fill ${cls}" style="width:${pct}%"></div></div>
+          </div>
+        </td>
+        <td class="prefix-cell">${esc(a.api_key_prefix || '—')}</td>
+        <td class="date-cell">${date}</td>
+      </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Plan</th>
+          <th>Ops Used</th>
+          <th>Key Prefix</th>
+          <th>Signed Up</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderError(msg) {
+  document.getElementById('table-body').innerHTML =
+    `<div class="table-error">⚠ ${esc(msg)}</div>`;
+  document.getElementById('table-count').textContent = '';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/v1/memory', require('./routes/memory'));
 app.use('/v1/agents', require('./routes/agents'));
+app.use('/v1/admin',  require('./routes/admin'));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'agentmemory' }));
 
