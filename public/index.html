@@ -441,6 +441,211 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   </div>
 </section>
 
+<!-- INTERACTIVE DEMO SECTION -->
+<section style="padding:80px 40px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container" style="text-align:center">
+    <div class="section-label">Live Demo</div>
+    <h2 style="margin-bottom:12px">Try it yourself</h2>
+    <p style="color:var(--muted);margin-bottom:48px;font-size:17px">No API key needed. Select a memory, store it, then recall it semantically.</p>
+    <div style="max-width:680px;margin:0 auto;text-align:left">
+<style>
+.ds *{box-sizing:border-box}
+.ds-shell{background:#09090F;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)}
+.ds-header{background:#0F0F1A;padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.ds-dots{display:flex;gap:6px}
+.ds-dot{width:10px;height:10px;border-radius:50%}
+.ds-title{font-size:12px;color:#6B6A7A;font-family:monospace;margin-left:8px}
+.ds-nav{display:flex;background:#0F0F1A;border-bottom:1px solid rgba(255,255,255,0.06)}
+.ds-tab{flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:500;color:#4A4860;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:0.04em;text-transform:uppercase}
+.ds-tab.active{color:#7B6EF6;border-bottom-color:#7B6EF6}
+.ds-tab.done{color:#2DD4BF}
+.ds-body{padding:24px}
+.ds-panel{display:none}
+.ds-panel.active{display:block}
+.ds-label{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#4A4860;margin-bottom:10px}
+.ds-code{background:#0A0A14;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;font-family:monospace;font-size:13px;line-height:1.8;margin-bottom:16px}
+.ds-code .kw{color:#C084FC}.ds-code .str{color:#86EFAC}.ds-code .key{color:#93C5FD}.ds-code .cmt{color:#3D3B55}.ds-code .num{color:#FCD34D}.ds-code .fn{color:#67E8F9}
+.ds-run{width:100%;background:#7B6EF6;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+.ds-run:hover{background:#9080FF;transform:translateY(-1px)}
+.ds-run:disabled{background:#2A2840;color:#4A4860;cursor:not-allowed;transform:none}
+.ds-resp{margin-top:14px;display:none}
+.ds-resp.show{display:block}
+.ds-rlabel{font-size:11px;color:#4A4860;margin-bottom:8px;font-family:monospace}
+.ds-rblock{background:#0A0A14;border:1px solid rgba(45,212,191,0.2);border-radius:10px;padding:16px;font-family:monospace;font-size:12px;line-height:1.8;color:#86EFAC}
+.ds-mlist{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.ds-mitem{background:#0A0A14;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+.ds-mitem:hover{border-color:rgba(123,110,246,0.4)}
+.ds-mitem.selected{border-color:#7B6EF6;background:#0D0D18}
+.ds-mdot{width:8px;height:8px;border-radius:50%;background:#7B6EF6;flex-shrink:0}
+.ds-mtext{font-size:12px;color:#9B99B0;font-family:monospace;flex:1}
+.ds-mtag{font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(123,110,246,0.1);color:#7B6EF6;font-weight:500}
+.ds-qwrap{margin-bottom:12px}
+.ds-qin{width:100%;background:#0A0A14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:11px 14px;font-size:13px;font-family:monospace;color:#F0EFE8;outline:none;transition:border-color .2s}
+.ds-qin:focus{border-color:#7B6EF6}
+.ds-qin::placeholder{color:#3D3B55}
+.ds-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.ds-chip{font-size:11px;padding:4px 10px;border-radius:99px;background:rgba(123,110,246,0.08);border:1px solid rgba(123,110,246,0.2);color:#7B6EF6;cursor:pointer;transition:all .15s}
+.ds-chip:hover{background:rgba(123,110,246,0.18)}
+.ds-ritem{background:#0A0A14;border:1px solid rgba(45,212,191,0.15);border-radius:8px;padding:12px 14px;margin-bottom:8px;animation:dsFade .3s ease}
+@keyframes dsFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.ds-rcontent{font-size:12px;color:#86EFAC;font-family:monospace;margin-bottom:6px}
+.ds-rmeta{display:flex;align-items:center;gap:8px}
+.ds-rscore{font-size:11px;color:#2DD4BF}
+.ds-rbar{height:3px;border-radius:99px;background:#7B6EF6;transition:width .6s ease;margin:0 4px}
+.ds-rsess{font-size:10px;color:#4A4860;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.04)}
+.ds-next{width:100%;background:transparent;border:1px solid rgba(123,110,246,0.3);color:#7B6EF6;border-radius:8px;padding:10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;margin-top:12px}
+.ds-next:hover{background:rgba(123,110,246,0.1)}
+.ds-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.2);border-radius:99px;padding:4px 12px;font-size:11px;color:#2DD4BF;font-weight:500;margin-bottom:12px}
+.ds-pulse{width:6px;height:6px;border-radius:50%;background:#2DD4BF;animation:dsPulse 1.5s infinite}
+@keyframes dsPulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+<div class="ds">
+<div class="ds-shell">
+  <div class="ds-header">
+    <div class="ds-dots">
+      <div class="ds-dot" style="background:#F87171"></div>
+      <div class="ds-dot" style="background:#FBBF24"></div>
+      <div class="ds-dot" style="background:#34D399"></div>
+    </div>
+    <div class="ds-title">memstore.dev — live demo</div>
+  </div>
+  <div class="ds-nav">
+    <div class="ds-tab active" id="dstab1" onclick="dsStep(1)">01 Store</div>
+    <div class="ds-tab" id="dstab2" onclick="dsStep(2)">02 Recall</div>
+    <div class="ds-tab" id="dstab3" onclick="dsStep(3)">03 Agent</div>
+  </div>
+  <div class="ds-body">
+    <div class="ds-panel active" id="dspanel1">
+      <div class="ds-label">Step 1 — Store a memory</div>
+      <div class="ds-code">
+        <span class="kw">curl</span> -X POST https://memstore.dev/v1/memory/remember \<br>
+        &nbsp;&nbsp;-H <span class="str">"Authorization: Bearer am_live_..."</span> \<br>
+        &nbsp;&nbsp;-d '<span class="key">{</span><span class="str">"content"</span>: <span class="str">"..."</span>, <span class="str">"session"</span>: <span class="str">"user_8821"</span><span class="key">}</span>'
+      </div>
+      <div class="ds-mlist">
+        <div style="font-size:11px;color:#3D3B55;font-family:monospace;margin-bottom:4px">Select a memory to store:</div>
+        <div class="ds-mitem" onclick="dsMem(this,'User prefers dark mode, uses React, timezone UTC-5','user_8821')"><div class="ds-mdot"></div><div class="ds-mtext">User prefers dark mode, uses React, timezone UTC-5</div><div class="ds-mtag">user_8821</div></div>
+        <div class="ds-mitem" onclick="dsMem(this,'Agent decided to use PostgreSQL for the database','task_42')"><div class="ds-mdot"></div><div class="ds-mtext">Agent decided to use PostgreSQL for the database</div><div class="ds-mtag">task_42</div></div>
+        <div class="ds-mitem" onclick="dsMem(this,'Customer Sarah reported billing issue on March 15th','support_991')"><div class="ds-mdot"></div><div class="ds-mtext">Customer Sarah reported billing issue on March 15th</div><div class="ds-mtag">support_991</div></div>
+        <div class="ds-mitem" onclick="dsMem(this,'API rate limit is 1000 req/min for the Pro tier','shared')"><div class="ds-mdot"></div><div class="ds-mtext">API rate limit is 1000 req/min for the Pro tier</div><div class="ds-mtag">shared</div></div>
+      </div>
+      <button class="ds-run" id="ds-store-btn" onclick="dsStore()" disabled>Select a memory above to store it</button>
+      <div class="ds-resp" id="ds-store-resp">
+        <div class="ds-rlabel">// Response 201 Created</div>
+        <div class="ds-rblock" id="ds-store-out"></div>
+        <button class="ds-next" onclick="dsStep(2)">Next: Recall it semantically →</button>
+      </div>
+    </div>
+    <div class="ds-panel" id="dspanel2">
+      <div class="ds-label">Step 2 — Recall semantically</div>
+      <div class="ds-label" style="margin-top:12px;color:#3D3B55">Try these queries (wording doesn't have to match exactly):</div>
+      <div class="ds-chips">
+        <div class="ds-chip" onclick="dsSetQ('editor preferences')">editor preferences</div>
+        <div class="ds-chip" onclick="dsSetQ('what database did we choose')">what database did we choose</div>
+        <div class="ds-chip" onclick="dsSetQ('billing complaint')">billing complaint</div>
+        <div class="ds-chip" onclick="dsSetQ('API limits')">API limits</div>
+        <div class="ds-chip" onclick="dsSetQ('UI theme settings')">UI theme settings</div>
+      </div>
+      <div class="ds-qwrap">
+        <input class="ds-qin" id="ds-qin" placeholder="Type your query..." oninput="dsQInput()" onkeydown="if(event.key==='Enter')dsRecall()">
+      </div>
+      <button class="ds-run" id="ds-recall-btn" onclick="dsRecall()" disabled>Search memories</button>
+      <div class="ds-resp" id="ds-recall-resp">
+        <div class="ds-rlabel">// Results ranked by semantic similarity</div>
+        <div id="ds-recall-out"></div>
+        <button class="ds-next" onclick="dsStep(3)">Next: See how an agent uses this →</button>
+      </div>
+    </div>
+    <div class="ds-panel" id="dspanel3">
+      <div class="ds-label">Step 3 — Inside your agent</div>
+      <div class="ds-code">
+        <span class="cmt"># Before every agent run</span><br>
+        memories = ms.<span class="fn">recall</span>(<span class="str">"user preferences"</span>, session=<span class="str">"user_8821"</span>)<br>
+        context = <span class="str">"\n"</span>.join([m[<span class="str">"content"</span>] <span class="kw">for</span> m <span class="kw">in</span> memories])<br><br>
+        <span class="cmt"># Inject into your LLM prompt</span><br>
+        prompt = <span class="fn">f</span><span class="str">"Context:\n{context}\n\nTask: {user_task}"</span><br><br>
+        <span class="cmt"># After learning something new</span><br>
+        ms.<span class="fn">remember</span>(<span class="str">"User switched to Vue.js"</span>, session=<span class="str">"user_8821"</span>)
+      </div>
+      <div class="ds-badge"><div class="ds-pulse"></div>Agent now has persistent memory across every run</div>
+      <p style="font-size:13px;color:#6B6A7A;line-height:1.7;margin-bottom:16px">Every run starts with full context. No re-explaining. No hallucinating past decisions.</p>
+      <button class="ds-run" onclick="window.open('https://memstore.dev','_self')">Get your free API key →</button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+var dsSel=null,dsStored=[];
+var dsBase=[
+  {content:"User prefers dark mode, uses React, timezone UTC-5",session:"user_8821"},
+  {content:"Agent decided to use PostgreSQL for the database",session:"task_42"},
+  {content:"Customer Sarah reported billing issue on March 15th",session:"support_991"},
+  {content:"API rate limit is 1000 req/min for the Pro tier",session:"shared"}
+];
+function dsSim(q,c){
+  var qw=q.toLowerCase().split(/\s+/),cw=c.toLowerCase();
+  var hit=qw.filter(function(w){return cw.includes(w)}).length;
+  var base=hit/Math.max(qw.length,1);
+  var keys=['prefer','dark','mode','react','postgres','database','billing','rate','limit','api','editor','theme','ui','complaint','settings'];
+  var bonus=keys.filter(function(k){return qw.some(function(w){return w.includes(k)})&&cw.includes(k)}).length*0.12;
+  return Math.min(0.99,Math.max(0.1,base*0.6+bonus+0.05));
+}
+function dsMem(el,content,session){
+  document.querySelectorAll('.ds-mitem').forEach(function(i){i.classList.remove('selected')});
+  el.classList.add('selected');
+  dsSel={content:content,session:session};
+  var btn=document.getElementById('ds-store-btn');
+  btn.textContent='Store this memory →';
+  btn.disabled=false;
+}
+function dsStore(){
+  if(!dsSel)return;
+  var btn=document.getElementById('ds-store-btn');
+  btn.disabled=true;btn.textContent='Storing...';
+  setTimeout(function(){
+    var id='mem_'+Math.random().toString(36).slice(2,8);
+    dsStored.push({content:dsSel.content,session:dsSel.session,id:id});
+    document.getElementById('ds-store-out').innerHTML=
+      '<span style="color:#93C5FD">"id"</span>: <span style="color:#86EFAC">"'+id+'"</span>,<br>'+
+      '<span style="color:#93C5FD">"content"</span>: <span style="color:#86EFAC">"'+dsSel.content.slice(0,38)+'..."</span>,<br>'+
+      '<span style="color:#93C5FD">"session"</span>: <span style="color:#86EFAC">"'+dsSel.session+'"</span>,<br>'+
+      '<span style="color:#93C5FD">"embedded"</span>: <span style="color:#FCD34D">true</span>';
+    document.getElementById('ds-store-resp').classList.add('show');
+    btn.textContent='✓ Stored — store another or continue';
+    document.getElementById('dstab1').classList.add('done');
+  },900);
+}
+function dsSetQ(q){document.getElementById('ds-qin').value=q;dsQInput();}
+function dsQInput(){document.getElementById('ds-recall-btn').disabled=document.getElementById('ds-qin').value.trim().length<2;}
+function dsRecall(){
+  var q=document.getElementById('ds-qin').value.trim();
+  if(!q)return;
+  var btn=document.getElementById('ds-recall-btn');
+  btn.disabled=true;btn.textContent='Searching...';
+  setTimeout(function(){
+    var all=dsBase.concat(dsStored);
+    var res=all.map(function(m){return{content:m.content,session:m.session,score:dsSim(q,m.content)}})
+      .sort(function(a,b){return b.score-a.score}).slice(0,3).filter(function(m){return m.score>0.12});
+    var out=document.getElementById('ds-recall-out');
+    if(!res.length){out.innerHTML='<div style="text-align:center;padding:20px;color:#3D3B55;font-size:12px;font-family:monospace">No relevant memories found.</div>';}
+    else{out.innerHTML=res.map(function(m){return'<div class="ds-ritem"><div class="ds-rcontent">"'+m.content+'"</div><div class="ds-rmeta"><div class="ds-rscore">score: '+m.score.toFixed(2)+'</div><div class="ds-rbar" style="width:'+Math.round(m.score*80)+'px"></div><div class="ds-rsess">'+m.session+'</div></div></div>';}).join('');}
+    document.getElementById('ds-recall-resp').classList.add('show');
+    btn.textContent='Search again';btn.disabled=false;
+    document.getElementById('dstab2').classList.add('done');
+  },700);
+}
+function dsStep(n){
+  document.querySelectorAll('.ds-panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.ds-tab').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('dspanel'+n).classList.add('active');
+  document.getElementById('dstab'+n).classList.add('active');
+}
+</script>
+    </div>
+  </div>
+</section>
+<!-- END DEMO SECTION -->
+
 <!-- DEFINITION -->
 <section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container" style="max-width:760px">
