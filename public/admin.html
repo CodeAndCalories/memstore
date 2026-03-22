@@ -187,21 +187,50 @@ tbody tr:hover td{background:rgba(255,255,255,0.02)}
 
 <script>
 // ── Config ────────────────────────────────────────────────────
-const ADMIN_PASSWORD = 'memstore-admin-2025'; // change this
-const SESSION_KEY    = 'ms_admin_token';
+// No password is stored here. The entered value is sent directly
+// to the API as a Bearer token and validated server-side against
+// the ADMIN_TOKEN env var. Wrong token → 401 from the server.
+const SESSION_KEY = 'ms_admin_token';
 
 // ── Auth ──────────────────────────────────────────────────────
-function unlock() {
+async function unlock() {
   const val = document.getElementById('pw-input').value.trim();
-  if (val === ADMIN_PASSWORD) {
+  if (!val) return;
+
+  const btn = document.querySelector('.lock-card button');
+  btn.textContent = 'Checking…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/v1/admin/agents', {
+      headers: { 'Authorization': `Bearer ${val}` }
+    });
+
+    if (res.status === 401) {
+      document.getElementById('lock-error').textContent = 'Incorrect password.';
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
+      return;
+    }
+
+    // Valid token — store and show dashboard
     sessionStorage.setItem(SESSION_KEY, val);
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('dashboard').style.display   = 'block';
-    loadAgents();
-  } else {
-    document.getElementById('lock-error').textContent = 'Incorrect password.';
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-input').focus();
+
+    // Render immediately with the response we already have
+    const json = await res.json();
+    renderStats(json.agents);
+    renderTable(json.agents);
+    const now = new Date();
+    document.getElementById('last-refreshed').textContent =
+      'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  } catch (err) {
+    document.getElementById('lock-error').textContent = 'Network error — is the server running?';
+  } finally {
+    btn.textContent = 'Unlock →';
+    btn.disabled = false;
   }
 }
 
@@ -216,12 +245,26 @@ document.getElementById('pw-input').addEventListener('keydown', e => {
   document.getElementById('lock-error').textContent = '';
 });
 
-// Auto-unlock if session still valid
-if (sessionStorage.getItem(SESSION_KEY) === ADMIN_PASSWORD) {
-  document.getElementById('lock-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display   = 'block';
-  loadAgents();
-}
+// Auto-unlock if a token is already in session — verify it's still valid
+(async () => {
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  if (!saved) return;
+  const res = await fetch('/v1/admin/agents', {
+    headers: { 'Authorization': `Bearer ${saved}` }
+  }).catch(() => null);
+  if (res && res.ok) {
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display   = 'block';
+    const json = await res.json();
+    renderStats(json.agents);
+    renderTable(json.agents);
+    const now = new Date();
+    document.getElementById('last-refreshed').textContent =
+      'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } else {
+    sessionStorage.removeItem(SESSION_KEY); // token expired or changed
+  }
+})();
 
 // ── Data loading ──────────────────────────────────────────────
 async function loadAgents() {
@@ -236,7 +279,9 @@ async function loadAgents() {
     });
 
     if (res.status === 401) {
-      renderError('Unauthorized — check ADMIN_TOKEN matches the session password.');
+      // Token was revoked or changed — kick back to lock screen
+      sessionStorage.removeItem(SESSION_KEY);
+      location.reload();
       return;
     }
 
