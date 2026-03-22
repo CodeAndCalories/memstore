@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Persistent memory API for AI agents. POST to remember, GET to recall semantically. Free tier available.">
+<meta name="description" content="Persistent memory API for AI agents. Store and recall context across runs with two REST calls. Works with LangChain, CrewAI, AutoGen. Free tier available.">
 <title>Memstore — Persistent Memory API for AI Agents</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -203,6 +203,16 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 .newsletter-msg.ok{color:var(--green)}
 .newsletter-msg.err{color:var(--red)}
 
+/* nav dropdown */
+.nav-dropdown{position:relative;display:flex;align-items:center}
+.nav-dropdown>a{display:flex;align-items:center;gap:4px}
+.nav-dropdown>a::after{content:'▾';font-size:10px;opacity:0.6;margin-top:1px}
+.nav-dropdown-menu{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(-4px);background:var(--surface);border:1px solid var(--border-bright);border-radius:10px;padding:6px;min-width:200px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:200}
+.nav-dropdown:hover .nav-dropdown-menu{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
+.nav-dropdown-menu a{display:block;padding:9px 14px;color:var(--muted);font-size:13px;text-decoration:none;border-radius:6px;transition:all .15s;white-space:nowrap}
+.nav-dropdown-menu a:hover{color:var(--text);background:var(--bg3)}
+.nav-dropdown-menu a::after{display:none}
+
 @media(max-width:768px){
   nav{padding:0 20px}
   .nav-links{display:none}
@@ -217,6 +227,8 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   .newsletter-form{max-width:100%}
   .step-connector{display:none}
   .price-card.featured{transform:none}
+  .try-grid,.problem-grid,.security-grid,.use-grid{grid-template-columns:1fr!important}
+  .diy-grid{grid-template-columns:1fr!important}
 }
 
 /* modal */
@@ -252,7 +264,15 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
     <a href="#how">How it works</a>
     <a href="#api">API</a>
     <a href="#pricing">Pricing</a>
-    <a href="/guide.html">Guides</a>
+    <div class="nav-dropdown">
+      <a href="/guide.html">Guides</a>
+      <div class="nav-dropdown-menu">
+        <a href="/quickstart.html">Quickstart</a>
+        <a href="/guide.html">Full guide</a>
+        <a href="/blog/langchain-memory.html">LangChain memory</a>
+        <a href="/blog/crewai-agent-memory.html">CrewAI memory</a>
+      </div>
+    </div>
     <a href="#" style="font-family:var(--font-mono);font-size:13px">Docs</a>
   </div>
   <a href="#" class="nav-cta" onclick="openModal();return false;">Get API key</a>
@@ -268,9 +288,10 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
     <div style="text-align:center">
       <div class="eyebrow"><span class="eyebrow-dot"></span>Memory API for AI Agents</div>
       <h1>Your agents <em>finally</em><br>remember everything</h1>
-      <p class="hero-sub">One REST API. Persistent semantic memory across every agent run. Stop losing context, stop re-explaining, stop hallucinating past decisions.</p>
+      <p style="font-size:17px;color:var(--muted);max-width:540px;margin:0 auto 16px;line-height:1.5">Store and recall memory across agent runs with a simple REST API.</p>
+      <p class="hero-sub">One POST to remember. One GET to recall. Persistent semantic memory for every agent — no vector DB setup required.</p>
       <div class="hero-actions">
-        <a href="#" class="btn-primary" onclick="openModal();return false;">Start for free &rarr;</a>
+        <a href="#" class="btn-primary" onclick="openModal();return false;">Get API Key &rarr;</a>
         <a href="#api" class="btn-ghost">View the API</a>
       </div>
       <div class="trust-row">
@@ -323,6 +344,68 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   <span class="key">"tokens_used"</span>: <span class="num">142</span>
 }</pre>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRY IT NOW -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-label">Try it now</div>
+    <h2>Two calls.<br>That's the whole API.</h2>
+    <p class="section-sub">Copy your key and run these in your terminal.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px" class="try-grid">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Store a memory</span>
+          <span style="background:rgba(52,211,153,0.12);color:var(--green);font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">POST</span>
+        </div>
+        <pre style="padding:24px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:var(--muted);overflow-x:auto;margin:0"><span style="color:#93C5FD">curl</span> -X POST https://memstore.dev/v1/memory/remember \
+  -H <span style="color:#86EFAC">"Authorization: Bearer YOUR_KEY"</span> \
+  -H <span style="color:#86EFAC">"Content-Type: application/json"</span> \
+  -d <span style="color:#86EFAC">'{"content":"User prefers dark mode, uses React"}'</span></pre>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Recall semantically</span>
+          <span style="background:rgba(147,197,253,0.12);color:#93C5FD;font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">GET</span>
+        </div>
+        <pre style="padding:24px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:var(--muted);overflow-x:auto;margin:0"><span style="color:#93C5FD">curl</span> "https://memstore.dev/v1/memory/recall?q=user+settings" \
+  -H <span style="color:#86EFAC">"Authorization: Bearer YOUR_KEY"</span>
+
+<span style="color:#4A4860"># {"memories":[{"content":"User prefers dark mode,</span>
+<span style="color:#4A4860">#   uses React","score":0.97,"age":"2h ago"}]}</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center" class="problem-grid">
+      <div>
+        <div class="section-label">The problem</div>
+        <h2>AI agents forget <em>everything</em><br>between runs</h2>
+        <p style="color:var(--muted);font-size:16px;line-height:1.7;margin-top:20px">Every session starts from zero. Your agent has no idea what the user said last week, what decisions were made, or what it already tried. That's not intelligence — that's amnesia.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px">
+          <div style="font-size:22px;margin-bottom:10px">🔁</div>
+          <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Repeated questions</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6">Agents ask users the same things over and over. Every run re-discovers what should have been remembered.</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px">
+          <div style="font-size:22px;margin-bottom:10px">🌀</div>
+          <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Context stuffing</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6">Dumping entire conversation history into every prompt is expensive, slow, and hits context limits fast.</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px">
+          <div style="font-size:22px;margin-bottom:10px">🎭</div>
+          <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">Hallucinating history</h3>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6">Without real memory, agents make up plausible-sounding facts about past interactions. Users notice.</p>
         </div>
       </div>
     </div>
@@ -397,6 +480,80 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   </div>
 </section>
 
+<!-- USE CASES -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-label">Use cases</div>
+    <h2>Built for every<br>agent type</h2>
+    <p class="section-sub">From customer-facing bots to internal automation pipelines.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:64px" class="use-grid">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
+        <div style="font-size:28px;margin-bottom:16px">🎧</div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Customer support bots</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Remember each customer's history, past tickets, and preferences. Resolve issues faster without making customers repeat themselves every time.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
+        <div style="font-size:28px;margin-bottom:16px">💼</div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Sales &amp; outreach agents</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Track every prospect interaction, objection, and follow-up. Agents remember deal context across weeks of back-and-forth.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
+        <div style="font-size:28px;margin-bottom:16px">🤖</div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Personal AI assistants</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Build assistants that genuinely know the user — their preferences, projects, habits, and goals — getting more useful with every interaction.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
+        <div style="font-size:28px;margin-bottom:16px">🔗</div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Multi-agent pipelines</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Share state across agent handoffs. One agent stores a decision; another recalls it 10 steps later — no message-passing spaghetti.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY NOT DIY -->
+<section>
+  <div class="container">
+    <div style="max-width:700px;margin:0 auto;text-align:center">
+      <div class="section-label">Why not build it yourself?</div>
+      <h2>You could. Here's what<br>that actually looks like.</h2>
+      <p style="color:var(--muted);font-size:16px;line-height:1.7;margin-top:20px">Rolling your own agent memory sounds like a weekend project. It isn't.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:48px;border:1px solid var(--border);border-radius:16px;overflow:hidden" class="diy-grid">
+      <div style="background:var(--surface);padding:32px;border-right:1px solid var(--border)">
+        <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand-dim);margin-bottom:16px">01</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px">Set up pgvector</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Configure Postgres, enable the extension, tune ivfflat list count, manage migrations. Then do it again for staging.</p>
+      </div>
+      <div style="background:var(--surface);padding:32px;border-right:1px solid var(--border)">
+        <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand-dim);margin-bottom:16px">02</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px">Wire OpenAI embeddings</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Call the embedding API on every store and recall. Handle rate limits, retries, model versioning, and dimension mismatches.</p>
+      </div>
+      <div style="background:var(--surface);padding:32px">
+        <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand-dim);margin-bottom:16px">03</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px">Build session scoping</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Design an agent isolation model, session namespacing, and access controls. Get it wrong and agents bleed context into each other.</p>
+      </div>
+      <div style="background:var(--surface);padding:32px;border-right:1px solid var(--border);border-top:1px solid var(--border)">
+        <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand-dim);margin-bottom:16px">04</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px">Implement TTL cleanup</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Write cron jobs to expire stale memories. Handle edge cases. Don't delete things that haven't expired yet. Debug at 2am.</p>
+      </div>
+      <div style="background:var(--surface);padding:32px;border-right:1px solid var(--border);border-top:1px solid var(--border)">
+        <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand-dim);margin-bottom:16px">05</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px">Add usage metering</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Track ops per agent, enforce limits, handle overages gracefully. Wire into billing. Keep counts consistent under concurrent load.</p>
+      </div>
+      <div style="background:var(--bg2);padding:32px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand);margin-bottom:16px">06</div>
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--brand)">Or just use Memstore</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Two REST calls. Done in an afternoon. Focus on your agent's actual intelligence, not infrastructure plumbing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- SCHEMA + ENDPOINTS -->
 <section id="api" class="schema-section">
   <div class="container">
@@ -441,12 +598,56 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   </div>
 </section>
 
+<!-- SECURITY -->
+<section>
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center" class="security-grid">
+      <div>
+        <div class="section-label">Security</div>
+        <h2>Your data<br>stays yours</h2>
+        <p style="color:var(--muted);font-size:16px;line-height:1.7;margin-top:20px">Agent memory contains sensitive context — user preferences, decisions, business logic. We treat it accordingly.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🔑</div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">Hashed API keys</h3>
+            <p style="font-size:14px;color:var(--muted);line-height:1.6">API keys are bcrypt-hashed on storage. We never store the raw key — not even in logs.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🏝️</div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">Agent isolation</h3>
+            <p style="font-size:14px;color:var(--muted);line-height:1.6">Each API key has its own namespace. No memory is shared or accessible across different agents or customers.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🔒</div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">Encrypted at rest</h3>
+            <p style="font-size:14px;color:var(--muted);line-height:1.6">All memory data is encrypted at rest (AES-256). Data in transit uses TLS 1.3.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">🚫</div>
+          <div>
+            <h3 style="font-size:15px;font-weight:600;margin-bottom:4px">No training on your data</h3>
+            <p style="font-size:14px;color:var(--muted);line-height:1.6">Your agent's memories are never used to train models or shared with third parties for any purpose.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- PRICING -->
 <section id="pricing">
   <div class="container" style="text-align:center">
     <div class="section-label">Pricing</div>
     <h2>Usage-based. No seats.</h2>
     <p class="section-sub" style="margin:0 auto">Pay for what your agents use. Free tier generous enough to build your first production agent.</p>
+    <p style="font-size:13px;color:var(--dim);margin-top:12px">1 operation = 1 store or recall call. Most agent runs use 20–100 ops.</p>
     <div class="pricing-grid">
       <div class="price-card">
         <div class="plan-name">Free</div>
