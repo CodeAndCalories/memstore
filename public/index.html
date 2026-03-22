@@ -216,6 +216,11 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 .cmp-table tbody tr:hover td{background:var(--bg3)}
 .cmp-table tbody tr:hover td.col-ms{background:rgba(123,110,246,0.09)}
 
+/* copy buttons */
+.copy-btn{background:rgba(123,110,246,0.12);border:1px solid rgba(123,110,246,0.25);color:var(--brand);font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer;font-family:var(--font-body);transition:all .15s;line-height:1;flex-shrink:0}
+.copy-btn:hover{background:rgba(123,110,246,0.22);border-color:rgba(123,110,246,0.5)}
+.copy-btn.copied{color:var(--green);border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.08)}
+
 /* nav dropdown */
 .nav-dropdown{position:relative;display:flex;align-items:center}
 .nav-dropdown>a{display:flex;align-items:center;gap:4px}
@@ -301,7 +306,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
     <div style="text-align:center">
       <div class="eyebrow"><span class="eyebrow-dot"></span>Memory API for AI Agents</div>
       <h1>Your agents <em>finally</em><br>remember everything</h1>
-      <p style="font-size:17px;color:var(--muted);max-width:540px;margin:0 auto 16px;line-height:1.5">Store and recall memory across agent runs with a simple REST API.</p>
+      <p style="font-size:17px;color:var(--muted);max-width:540px;margin:0 auto 16px;line-height:1.5">Persistent memory API for AI agents. Store and recall across runs.</p>
       <p class="hero-sub">One POST to remember. One GET to recall. Persistent semantic memory for every agent — no vector DB setup required.</p>
       <div class="hero-actions">
         <a href="#" class="btn-primary" onclick="openModal();return false;">Get API Key &rarr;</a>
@@ -323,8 +328,8 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
           <div class="url-bar">api.memstore.dev/v1/memory</div>
         </div>
         <div class="code-split">
-          <div class="code-panel">
-            <div class="panel-label">Store a memory</div>
+          <div class="code-panel" data-cw>
+            <div class="panel-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span>Store a memory</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
             <pre><span class="kw">const</span> <span class="fn">res</span> = <span class="kw">await</span> fetch(<span class="str">'https://api.memstore.dev</span>
 <span class="str">  /v1/memory/remember'</span>, {
   <span class="key">method</span>: <span class="str">'POST'</span>,
@@ -340,8 +345,8 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   })
 });</pre>
           </div>
-          <div class="code-panel response-panel">
-            <div class="panel-label">Recall semantically</div>
+          <div class="code-panel response-panel" data-cw>
+            <div class="panel-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span>Recall semantically</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
             <pre><span class="cmt">// GET /v1/memory/recall?q=user+preferences</span>
 
 <span class="cmt">// Response:</span>
@@ -369,21 +374,28 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
     <div class="section-label">Try it now</div>
     <h2>Two calls.<br>That's the whole API.</h2>
     <p class="section-sub">Copy your key and run these in your terminal.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px" class="try-grid">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
-        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+    <p style="font-size:13px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:0.1em;margin-top:32px;margin-bottom:16px">Try it in 60 seconds</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="try-grid">
+      <div data-cw style="background:var(--surface);border:1px solid rgba(123,110,246,0.4);border-radius:var(--radius);overflow:hidden">
+        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Store a memory</span>
-          <span style="background:rgba(52,211,153,0.12);color:var(--green);font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">POST</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:rgba(52,211,153,0.12);color:var(--green);font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">POST</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
         <pre style="padding:24px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:var(--muted);overflow-x:auto;margin:0"><span style="color:#93C5FD">curl</span> -X POST https://memstore.dev/v1/memory/remember \
   -H <span style="color:#86EFAC">"Authorization: Bearer YOUR_KEY"</span> \
   -H <span style="color:#86EFAC">"Content-Type: application/json"</span> \
   -d <span style="color:#86EFAC">'{"content":"User prefers dark mode, uses React"}'</span></pre>
       </div>
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
-        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div data-cw style="background:var(--surface);border:1px solid rgba(123,110,246,0.4);border-radius:var(--radius);overflow:hidden">
+        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Recall semantically</span>
-          <span style="background:rgba(147,197,253,0.12);color:#93C5FD;font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">GET</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="background:rgba(147,197,253,0.12);color:#93C5FD;font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--font-mono)">GET</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          </div>
         </div>
         <pre style="padding:24px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:var(--muted);overflow-x:auto;margin:0"><span style="color:#93C5FD">curl</span> "https://memstore.dev/v1/memory/recall?q=user+settings" \
   -H <span style="color:#86EFAC">"Authorization: Bearer YOUR_KEY"</span>
@@ -425,6 +437,15 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   </div>
 </section>
 
+<!-- DEFINITION -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container" style="max-width:760px">
+    <div class="section-label">Definition</div>
+    <h2>What is persistent memory<br>for AI agents?</h2>
+    <p style="font-size:17px;color:var(--muted);line-height:1.85;margin-top:24px">Persistent memory for AI agents is the ability to store facts, decisions, and context outside the agent runtime and retrieve them semantically on future runs. Unlike context window stuffing, persistent memory scales across sessions, reduces token costs, and gives agents long-term recall without manual state management.</p>
+  </div>
+</section>
+
 <!-- HOW IT WORKS -->
 <section id="how" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
@@ -456,7 +477,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 <section>
   <div class="container">
     <div class="section-label">Built for production agents</div>
-    <h2>Everything agents<br>actually need</h2>
+    <h2>What your agent needs<br>to remember</h2>
     <p class="section-sub">Not a vector DB tutorial. A production-grade memory layer with agent-native primitives.</p>
     <div class="features-grid">
       <div class="feat">
@@ -519,6 +540,55 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
         <div style="font-size:28px;margin-bottom:16px">🔗</div>
         <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Multi-agent pipelines</h3>
         <p style="font-size:14px;color:var(--muted);line-height:1.7">Share state across agent handoffs. One agent stores a decision; another recalls it 10 steps later — no message-passing spaghetti.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MID-PAGE CTA -->
+<section style="padding:56px 40px;text-align:center;background:var(--bg)">
+  <div class="container">
+    <a href="#" class="btn-primary" style="font-size:15px;padding:14px 40px" onclick="openModal();return false;">Get API Key &rarr;</a>
+    <p style="margin-top:14px;font-size:13px;color:var(--dim)">Free tier · No credit card · First key in 30 seconds</p>
+  </div>
+</section>
+
+<!-- FRAMEWORK SNIPPETS -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-label">Integrations</div>
+    <h2>Works with your<br>existing stack</h2>
+    <p class="section-sub">No SDK required. Any language that can make an HTTP request works with Memstore.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px" class="try-grid">
+      <div data-cw style="background:var(--surface);border:1px solid rgba(123,110,246,0.4);border-radius:var(--radius);overflow:hidden">
+        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Python</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre style="padding:24px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:var(--muted);overflow-x:auto;margin:0"><span class="cmt"># LangChain / CrewAI / any agent</span>
+<span class="kw">import</span> requests
+
+requests.post(
+  <span class="str">"https://memstore.dev/v1/memory/remember"</span>,
+  headers={<span class="str">"Authorization"</span>: <span class="fn">f"Bearer {api_key}"</span>},
+  json={<span class="str">"content"</span>: <span class="str">"User prefers dark mode"</span>}
+)</pre>
+      </div>
+      <div data-cw style="background:var(--surface);border:1px solid rgba(123,110,246,0.4);border-radius:var(--radius);overflow:hidden">
+        <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Node.js</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre style="padding:24px;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;color:var(--muted);overflow-x:auto;margin:0"><span class="cmt">// Any JS agent or framework</span>
+<span class="kw">await</span> fetch(
+  <span class="str">"https://memstore.dev/v1/memory/remember"</span>,
+  { <span class="key">method</span>: <span class="str">"POST"</span>,
+    <span class="key">headers</span>: { Authorization: <span class="str">`Bearer ${apiKey}`</span> },
+    <span class="key">body</span>: JSON.stringify({
+      <span class="key">content</span>: <span class="str">"User prefers dark mode"</span>
+    })
+  }
+)</pre>
       </div>
     </div>
   </div>
@@ -626,7 +696,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
     <div class="schema-wrap">
       <div class="schema-desc">
         <div class="section-label">The API</div>
-        <h2>Simple enough to ship today</h2>
+        <h2>Ship memory in minutes</h2>
         <p>Five endpoints. Bearer auth. JSON in, JSON out. Structured errors your agent can actually act on. No SDK required — though we have one.</p>
         <div class="endpoint-list">
           <div class="endpoint"><span class="method m-post">POST</span><span class="path">/v1/memory/remember</span></div>
@@ -641,7 +711,8 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
           <div class="stab active">DB schema</div>
           <div class="stab">Error format</div>
         </div>
-        <div class="schema-body">
+        <div class="schema-body" data-cw style="position:relative">
+          <button class="copy-btn" style="position:absolute;top:12px;right:12px" onclick="copyCode(this)">Copy</button>
           <pre style="font-family:var(--font-mono);font-size:12.5px;line-height:1.8;color:var(--muted)"><span class="cmt">-- memories table (Supabase pgvector)</span>
 <span class="kw">CREATE TABLE</span> memories (
   id        <span class="fn">uuid</span> <span class="kw">PRIMARY KEY</span>,
@@ -668,7 +739,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 <section id="pricing">
   <div class="container" style="text-align:center">
     <div class="section-label">Pricing</div>
-    <h2>Usage-based. No seats.</h2>
+    <h2>Usage-based pricing. No seats. No surprises.</h2>
     <p class="section-sub" style="margin:0 auto">Pay for what your agents use. Free tier generous enough to build your first production agent.</p>
     <p style="font-size:13px;color:var(--dim);margin-top:12px">1 operation = 1 store or recall call. Most agent runs use 20–100 ops.</p>
     <div class="pricing-grid">
@@ -676,8 +747,9 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
         <div class="plan-name">Free</div>
         <div class="plan-price"><sup></sup>$0</div>
         <div class="plan-period">forever</div>
+        <div style="display:inline-block;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--green);font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin-bottom:20px">No credit card required</div>
         <ul class="plan-features">
-          <li>1,000 operations/month</li>
+          <li style="font-size:15px;font-weight:600;color:var(--text)">1,000 operations/month</li>
           <li>50MB memory storage</li>
           <li>Semantic recall</li>
           <li>Session isolation</li>
@@ -850,6 +922,19 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 </footer>
 
 <script>
+// ── Copy code blocks ───────────────────────────────────────────
+function copyCode(btn){
+  const wrap=btn.closest('[data-cw]');
+  const pre=wrap?wrap.querySelector('pre'):btn.parentElement.querySelector('pre');
+  if(!pre)return;
+  const text=pre.textContent;
+  const done=()=>{btn.textContent='Copied ✓';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);};
+  navigator.clipboard.writeText(text).then(done).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done();
+  });
+}
+
 // ── FAQ accordion ──────────────────────────────────────────────
 function toggleFaq(el){
   const item=el.parentElement;
