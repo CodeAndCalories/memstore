@@ -109,9 +109,9 @@ router.post('/', async (req, res) => {
               <table cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td style="padding-right:8px">
-                    <a href="https://memstore.dev/guide.html"
+                    <a href="https://memstore.dev/quickstart.html"
                        style="display:block;background:#7B6EF6;color:#fff;text-decoration:none;padding:13px 20px;border-radius:8px;font-size:14px;font-weight:500;text-align:center">
-                      Read the guide &rarr;
+                      Get started &rarr;
                     </a>
                   </td>
                   <td style="padding-left:8px">

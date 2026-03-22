@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quickstart — Memstore</title>
+<meta name="description" content="Get started with Memstore in minutes. Store your first memory, recall it semantically, and wire it into your agent with curl, Python, or Node.js.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;--bg2:#0F0F1A;--bg3:#13131F;--surface:#161624;
+  --border:rgba(255,255,255,0.07);--border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;--muted:#8886A0;--dim:#4A4860;
+  --brand:#7B6EF6;--brand-dim:#3D3680;--brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;--amber:#F59E0B;--green:#34D399;--red:#F87171;
+  --radius:12px;
+  --font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+
+/* hero */
+.page-hero{padding:120px 40px 56px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:500px;height:280px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:20px}
+.page-hero h1{font-family:var(--font-display);font-size:clamp(40px,6vw,68px);font-weight:400;line-height:1.08;letter-spacing:-0.02em;margin-bottom:16px}
+.page-hero h1 em{font-style:italic;color:var(--brand)}
+.page-hero p{font-size:18px;color:var(--muted);max-width:480px;margin:0 auto}
+
+/* layout */
+.qs-wrap{max-width:800px;margin:0 auto;padding:16px 40px 100px}
+
+/* step blocks */
+.step{margin-bottom:72px}
+.step-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.step-num{font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--brand);background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:6px;padding:4px 10px;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap}
+.step h2{font-family:var(--font-display);font-size:clamp(28px,4vw,38px);font-weight:400;line-height:1.1;letter-spacing:-0.01em}
+.step>p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:24px}
+
+/* tab switcher */
+.tabs{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:0;width:fit-content}
+.tab{padding:7px 16px;border-radius:7px;font-size:13px;font-weight:500;font-family:var(--font-mono);color:var(--dim);cursor:pointer;transition:all .15s;user-select:none;border:none;background:none}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.4)}
+.tab-panels{border:1px solid var(--border);border-radius:0 var(--radius) var(--radius) var(--radius);overflow:hidden;margin-top:-1px}
+.tab-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:16px}
+.tab-wrap .tabs{border-radius:0;background:var(--bg3);border:none;border-bottom:1px solid var(--border);padding:0;width:100%}
+.tab-wrap .tab{border-radius:0;padding:11px 20px;font-size:12px}
+.tab-wrap .tab.active{background:transparent;color:var(--text);box-shadow:none;border-bottom:2px solid var(--brand)}
+.panel{display:none}
+.panel.active{display:block}
+pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted);background:var(--bg2)}
+
+/* syntax */
+.kw{color:#C084FC}.str{color:#86EFAC}.key{color:#93C5FD}
+.cmt{color:var(--dim)}.fn{color:#67E8F9}.num{color:#FCD34D}.cls{color:var(--amber)}
+
+/* response box */
+.response-wrap{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.response-label{background:var(--bg3);padding:10px 20px;font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.response-wrap pre{background:var(--bg2)}
+
+/* callout */
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:18px 22px;margin:20px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+
+/* pseudo-code pattern */
+.pattern-grid{display:flex;flex-direction:column;gap:2px;margin-top:4px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.pattern-step{background:var(--surface);padding:20px 24px;border-bottom:1px solid var(--border);display:flex;gap:20px;align-items:flex-start}
+.pattern-step:last-child{border-bottom:none}
+.pattern-arrow{font-family:var(--font-mono);font-size:18px;color:var(--brand-dim);flex-shrink:0;margin-top:2px}
+.pattern-step h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+.pattern-step p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
+.pattern-step code{font-family:var(--font-mono);font-size:12px;color:var(--brand)}
+
+/* divider */
+.qs-divider{border:none;border-top:1px solid var(--border);margin:0 0 72px}
+
+/* footer nav */
+.page-footer-nav{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-footer-nav p{font-size:15px;color:var(--muted)}
+.page-footer-nav p strong{color:var(--text)}
+.btn-outline{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-bright);color:var(--text);padding:10px 22px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand)}
+
+/* footer */
+footer{padding:40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+
+@media(max-width:768px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .page-hero{padding:100px 20px 40px}
+  .qs-wrap{padding:16px 20px 64px}
+  .page-footer-nav{flex-direction:column;align-items:flex-start}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><span class="logo-dot"></span>memstore</a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<div class="page-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="eyebrow">Quickstart</div>
+    <h1>Up and running<br>in <em>three steps</em></h1>
+    <p>Store a memory, recall it semantically, wire it into your agent.</p>
+  </div>
+</div>
+
+<div class="qs-wrap">
+
+  <!-- ── STEP 1 ── -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-num">Step 01</span>
+      <h2>Store your first memory</h2>
+    </div>
+    <p>Send any plain-text string to <code style="font-family:var(--font-mono);font-size:14px;color:var(--brand)">/v1/memory/remember</code>. Memstore embeds it automatically — no embedding code required on your side.</p>
+
+    <div class="tab-wrap" id="s1">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('s1',0,this)">curl</button>
+        <button class="tab" onclick="switchTab('s1',1,this)">Python</button>
+        <button class="tab" onclick="switchTab('s1',2,this)">Node.js</button>
+      </div>
+      <div class="panel active"><pre>curl -X POST https://memstore.dev/v1/memory/remember \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "content": "The user prefers concise answers and codes in Python."
+  }'</span></pre></div>
+      <div class="panel"><pre><span class="kw">import</span> requests
+
+response = requests.<span class="fn">post</span>(
+    <span class="str">"https://memstore.dev/v1/memory/remember"</span>,
+    headers={<span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>},
+    json={<span class="str">"content"</span>: <span class="str">"The user prefers concise answers and codes in Python."</span>}
+)
+<span class="fn">print</span>(response.<span class="fn">json</span>())
+<span class="cmt"># {"id": "abc123...", "content": "...", "created_at": "..."}</span></pre></div>
+      <div class="panel"><pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://memstore.dev/v1/memory/remember"</span>, {
+  method: <span class="str">"POST"</span>,
+  headers: {
+    <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>,
+    <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
+  },
+  body: <span class="cls">JSON</span>.<span class="fn">stringify</span>({
+    content: <span class="str">"The user prefers concise answers and codes in Python."</span>,
+  }),
+});
+<span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+console.<span class="fn">log</span>(data);
+<span class="cmt">// { id: "abc123...", content: "...", created_at: "..." }</span></pre></div>
+    </div>
+
+    <div class="response-wrap">
+      <div class="response-label">Response</div>
+      <pre>{
+  <span class="key">"id"</span>:         <span class="str">"fc6eb8f5-b456-42ba-a7f1-e0fc9be8a9a9"</span>,
+  <span class="key">"content"</span>:    <span class="str">"The user prefers concise answers and codes in Python."</span>,
+  <span class="key">"session"</span>:    <span class="kw">null</span>,
+  <span class="key">"metadata"</span>:   {},
+  <span class="key">"created_at"</span>: <span class="str">"2026-03-21T18:15:03.715Z"</span>
+}</pre>
+    </div>
+  </div>
+
+  <hr class="qs-divider">
+
+  <!-- ── STEP 2 ── -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-num">Step 02</span>
+      <h2>Recall it semantically</h2>
+    </div>
+    <p>Query with natural language using <code style="font-family:var(--font-mono);font-size:14px;color:var(--brand)">/v1/memory/recall?q=</code>. You don't need the exact wording — Memstore finds what's <em>conceptually relevant</em>.</p>
+
+    <div class="tab-wrap" id="s2">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('s2',0,this)">curl</button>
+        <button class="tab" onclick="switchTab('s2',1,this)">Python</button>
+        <button class="tab" onclick="switchTab('s2',2,this)">Node.js</button>
+      </div>
+      <div class="panel active"><pre>curl <span class="str">"https://memstore.dev/v1/memory/recall?q=what+language+does+this+user+prefer"</span> \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span></pre></div>
+      <div class="panel"><pre>response = requests.<span class="fn">get</span>(
+    <span class="str">"https://memstore.dev/v1/memory/recall"</span>,
+    headers={<span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>},
+    params={<span class="str">"q"</span>: <span class="str">"what language does this user prefer"</span>}
+)
+memories = response.<span class="fn">json</span>()[<span class="str">"memories"</span>]
+<span class="fn">print</span>(memories[<span class="num">0</span>][<span class="str">"content"</span>])
+<span class="cmt"># "The user prefers concise answers and codes in Python."</span></pre></div>
+      <div class="panel"><pre><span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(
+  <span class="str">"https://memstore.dev/v1/memory/recall?q=what+language+does+this+user+prefer"</span>,
+  { headers: { <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span> } }
+);
+<span class="kw">const</span> { memories } = <span class="kw">await</span> res.<span class="fn">json</span>();
+console.<span class="fn">log</span>(memories[<span class="num">0</span>].content);
+<span class="cmt">// "The user prefers concise answers and codes in Python."</span></pre></div>
+    </div>
+
+    <div class="response-wrap">
+      <div class="response-label">Response</div>
+      <pre>{
+  <span class="key">"memories"</span>: [
+    {
+      <span class="key">"id"</span>:         <span class="str">"fc6eb8f5-b456-42ba-a7f1-e0fc9be8a9a9"</span>,
+      <span class="key">"content"</span>:    <span class="str">"The user prefers concise answers and codes in Python."</span>,
+      <span class="key">"score"</span>:      <span class="num">0.87</span>,
+      <span class="key">"created_at"</span>: <span class="str">"2026-03-21T18:15:03.715Z"</span>
+    }
+  ],
+  <span class="key">"count"</span>: <span class="num">1</span>,
+  <span class="key">"query"</span>: <span class="str">"what language does this user prefer"</span>
+}</pre>
+    </div>
+
+    <div class="callout" style="margin-top:20px"><strong>Why this works:</strong> The query "what language does this user prefer" never appears in the stored text — yet Memstore returns it at 0.87 similarity because the <em>meaning</em> matches. That's semantic search.</div>
+  </div>
+
+  <hr class="qs-divider">
+
+  <!-- ── STEP 3 ── -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-num">Step 03</span>
+      <h2>Wire it into your agent</h2>
+    </div>
+    <p>The pattern is the same regardless of framework: recall context <em>before</em> you call the LLM, store new facts <em>after</em>. Two lines, infinite memory.</p>
+
+    <div class="pattern-grid">
+      <div class="pattern-step">
+        <div class="pattern-arrow">①</div>
+        <div>
+          <h3>Recall relevant context</h3>
+          <p>Before the LLM call, fetch memories related to the current query and inject them into the system prompt.</p>
+          <p style="margin-top:8px"><code>GET /v1/memory/recall?q={user_message}</code></p>
+        </div>
+      </div>
+      <div class="pattern-step">
+        <div class="pattern-arrow">②</div>
+        <div>
+          <h3>Run your LLM with memory injected</h3>
+          <p>Prepend recalled memories to the system prompt as "Relevant context". The LLM reasons over past facts automatically.</p>
+        </div>
+      </div>
+      <div class="pattern-step">
+        <div class="pattern-arrow">③</div>
+        <div>
+          <h3>Store anything worth keeping</h3>
+          <p>After the LLM responds, decide what's worth remembering — preferences, decisions, facts — and store it.</p>
+          <p style="margin-top:8px"><code>POST /v1/memory/remember</code></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-wrap" id="s3" style="margin-top:24px">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('s3',0,this)">Python</button>
+        <button class="tab" onclick="switchTab('s3',1,this)">Node.js</button>
+      </div>
+      <div class="panel active"><pre><span class="kw">import</span> requests, openai
+
+API_KEY = <span class="str">"YOUR_API_KEY"</span>
+headers = {<span class="str">"Authorization"</span>: <span class="fn">f</span><span class="str">"Bearer {API_KEY}"</span>}
+
+<span class="kw">def</span> <span class="fn">chat</span>(user_message: str) -> str:
+    <span class="cmt"># ① Recall</span>
+    mems = requests.<span class="fn">get</span>(
+        <span class="str">"https://memstore.dev/v1/memory/recall"</span>,
+        headers=headers, params={<span class="str">"q"</span>: user_message, <span class="str">"top_k"</span>: <span class="num">3</span>}
+    ).<span class="fn">json</span>().<span class="fn">get</span>(<span class="str">"memories"</span>, [])
+
+    context = <span class="str">"\n"</span>.<span class="fn">join</span>(m[<span class="str">"content"</span>] <span class="kw">for</span> m <span class="kw">in</span> mems)
+
+    <span class="cmt"># ② Run LLM with memory injected</span>
+    reply = openai.chat.completions.<span class="fn">create</span>(
+        model=<span class="str">"gpt-4o"</span>,
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: <span class="fn">f</span><span class="str">"Relevant context:\n{context}"</span>},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>,   <span class="str">"content"</span>: user_message},
+        ]
+    ).choices[<span class="num">0</span>].message.content
+
+    <span class="cmt"># ③ Store new fact if worth keeping</span>
+    requests.<span class="fn">post</span>(
+        <span class="str">"https://memstore.dev/v1/memory/remember"</span>,
+        headers=headers,
+        json={<span class="str">"content"</span>: <span class="fn">f</span><span class="str">"User asked: {user_message}. Agent replied: {reply}"</span>}
+    )
+
+    <span class="kw">return</span> reply</pre></div>
+      <div class="panel"><pre><span class="kw">import</span> OpenAI <span class="kw">from</span> <span class="str">"openai"</span>;
+
+<span class="kw">const</span> openai = <span class="kw">new</span> <span class="cls">OpenAI</span>();
+<span class="kw">const</span> BASE   = <span class="str">"https://memstore.dev/v1/memory"</span>;
+<span class="kw">const</span> HDRS   = { <span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span> };
+
+<span class="kw">async function</span> <span class="fn">chat</span>(userMessage) {
+  <span class="cmt">// ① Recall</span>
+  <span class="kw">const</span> { memories = [] } = <span class="kw">await</span> <span class="fn">fetch</span>(
+    <span class="str">`${BASE}/recall?q=${<span class="fn">encodeURIComponent</span>(userMessage)}&top_k=3`</span>,
+    { headers: HDRS }
+  ).<span class="fn">then</span>(r => r.<span class="fn">json</span>());
+
+  <span class="kw">const</span> context = memories.<span class="fn">map</span>(m => m.content).<span class="fn">join</span>(<span class="str">"\n"</span>);
+
+  <span class="cmt">// ② Run LLM with memory injected</span>
+  <span class="kw">const</span> { choices } = <span class="kw">await</span> openai.chat.completions.<span class="fn">create</span>({
+    model: <span class="str">"gpt-4o"</span>,
+    messages: [
+      { role: <span class="str">"system"</span>, content: <span class="str">`Relevant context:\n${context}`</span> },
+      { role: <span class="str">"user"</span>,   content: userMessage },
+    ],
+  });
+  <span class="kw">const</span> reply = choices[<span class="num">0</span>].message.content;
+
+  <span class="cmt">// ③ Store new fact</span>
+  <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${BASE}/remember`</span>, {
+    method: <span class="str">"POST"</span>,
+    headers: { ...HDRS, <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span> },
+    body: <span class="cls">JSON</span>.<span class="fn">stringify</span>({ content: <span class="str">`User: ${userMessage} | Agent: ${reply}`</span> }),
+  });
+
+  <span class="kw">return</span> reply;
+}</pre></div>
+    </div>
+  </div>
+
+  <!-- footer nav -->
+  <div class="page-footer-nav">
+    <p><strong>That's it.</strong> Your agent now has persistent memory across every run.</p>
+    <a href="/guide.html" class="btn-outline">View full guide &rarr;</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="logo-dot"></span>memstore</div>
+  <div class="footer-links">
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+    <a href="/blog/langchain-memory.html">Blog</a>
+  </div>
+  <div class="footer-legal">© 2025 Memstore</div>
+</footer>
+
+<script>
+function switchTab(groupId, index, btn) {
+  const wrap   = document.getElementById(groupId);
+  const tabs   = wrap.querySelectorAll('.tab');
+  const panels = wrap.querySelectorAll('.panel');
+  tabs.forEach(t => t.classList.remove('active'));
+  panels.forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  panels[index].classList.add('active');
+}
+</script>
+</body>
+</html>
