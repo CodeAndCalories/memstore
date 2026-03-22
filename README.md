@@ -1,63 +1,61 @@
-# AgentMemory
+# Memstore
 
-Persistent memory API for AI agents. POST to remember, GET to recall semantically.
+**Persistent memory API for AI agents.**
 
-## Stack
-- Node.js + Express
-- Supabase (pgvector for semantic search)
-- OpenAI text-embedding-3-small
-- Railway (deployment)
-- Stripe (billing)
+Give your AI agents a long-term memory — store what they learn, recall it semantically, and scope it by session. One API key, five endpoints, works with any agent framework.
 
-## Setup
-
-1. Copy `.env.example` to `.env` and fill in your keys
-2. In Supabase SQL editor: run `database/schema.sql` then `database/functions.sql`
-3. Enable pgvector in Supabase: Dashboard → Database → Extensions → vector
-4. `npm install`
-5. `npm run dev`
-
-## API
-
-```
-POST /v1/agents              — create agent + get API key
-POST /v1/memory/remember     — store a memory
-GET  /v1/memory/recall?q=... — semantic search
-DEL  /v1/memory/forget/:id   — delete a memory
-GET  /v1/memory/list         — list all memories
-```
-
-## Deploy to Railway
-Same flow as CallRelayHQ:
-- Push to GitHub
-- Connect repo in Railway
-- Add env vars
-- Deploy
+🔗 [memstore.dev](https://memstore.dev)
 
 ---
 
-## Claude Code prompt to continue
+## What it does
 
-Paste this into Claude Code to continue development:
+Memstore lets AI agents remember things across conversations. You POST a memory (plain text), and Memstore embeds it with OpenAI and stores it in a vector database. Later, you GET memories back using natural language — it returns the most semantically similar results, not just keyword matches.
+
+---
+
+## Endpoints
 
 ```
-I'm building AgentMemory — a persistent memory API for AI agents.
-Stack: Node.js + Express + Supabase pgvector + OpenAI embeddings.
-
-Project is set up at ./agentmemory with:
-- backend/server.js (Express entry)
-- backend/routes/memory.js (remember/recall/forget/list)
-- backend/routes/agents.js (create agent + API key)
-- backend/services/memory.js (pgvector logic)
-- backend/services/embed.js (OpenAI embeddings)
-- backend/middleware/auth.js (Bearer key validation)
-- database/schema.sql + functions.sql (run in Supabase)
-
-Next tasks:
-1. npm install and verify server starts
-2. Test POST /v1/agents creates an agent and returns API key
-3. Test POST /v1/memory/remember stores a memory
-4. Test GET /v1/memory/recall?q=... returns semantically similar memories
-5. Add Stripe webhook for plan upgrades (starter/pro)
-6. Deploy to Railway
+POST /v1/agents              Create an agent and receive an API key
+POST /v1/memory/remember     Store a memory (embedded automatically)
+GET  /v1/memory/recall?q=…   Semantic search across stored memories
+DEL  /v1/memory/forget/:id   Delete a specific memory
+GET  /v1/memory/list         List all memories (paginated)
 ```
+
+All endpoints (except `/v1/agents`) require:
+```
+Authorization: Bearer <your_api_key>
+```
+
+---
+
+## Quick start
+
+```bash
+# 1. Create an agent
+curl -X POST https://memstore.dev/v1/agents \
+  -H "Content-Type: application/json" \
+  -d '{"name": "My Agent", "email": "you@example.com"}'
+
+# 2. Store a memory
+curl -X POST https://memstore.dev/v1/memory/remember \
+  -H "Authorization: Bearer am_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{"content": "The user prefers concise answers and uses Python."}'
+
+# 3. Recall semantically
+curl "https://memstore.dev/v1/memory/recall?q=what+language+does+the+user+prefer" \
+  -H "Authorization: Bearer am_live_..."
+```
+
+---
+
+## Stack
+
+- **Node.js + Express** — API server
+- **Supabase + pgvector** — vector storage and semantic search
+- **OpenAI** — `text-embedding-3-small` for embeddings
+- **Railway** — deployment
+- **Stripe** — usage-based billing
