@@ -42,6 +42,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;d
 .nav-links{display:flex;align-items:center;gap:32px}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
 .nav-links a:hover{color:var(--text)}
+.nav-upgrade{color:var(--brand);font-size:14px;font-weight:500;text-decoration:none;border:1px solid var(--brand);padding:7px 16px;border-radius:8px;transition:all .2s}
+.nav-upgrade:hover{background:rgba(123,110,246,0.1);transform:translateY(-1px)}
 .nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
 .nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
 
@@ -293,6 +295,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
     </div>
     <a href="#" style="font-family:var(--font-mono);font-size:13px">Docs</a>
   </div>
+  <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" class="nav-upgrade" target="_blank" rel="noopener">Upgrade plan</a>
   <a href="#" class="nav-cta" onclick="openModal();return false;">Get API key</a>
 </nav>
 
@@ -404,6 +407,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 <span style="color:#4A4860">#   uses React","score":0.97,"age":"2h ago"}]}</span></pre>
       </div>
     </div>
+    <p style="margin-top:32px;text-align:center;font-size:14px;color:var(--dim)">Ready for production? <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;font-weight:500">Upgrade to Starter &rarr;</a></p>
   </div>
 </section>
 
@@ -755,6 +759,7 @@ requests.post(
           <li>Session isolation</li>
         </ul>
         <a href="#" class="plan-cta" onclick="openModal();return false;">Get started free</a>
+        <p style="margin-top:12px;font-size:12px;color:var(--dim);text-align:center">Need more? <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;font-weight:500">Upgrade to Starter &rarr;</a></p>
       </div>
       <div class="price-card featured">
         <div class="featured-badge">Most Popular</div>
