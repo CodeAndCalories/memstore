@@ -1,0 +1,10 @@
+<svg width="220" height="48" viewBox="0 0 220 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="48" rx="10" fill="#09090F"/>
+  <circle cx="24" cy="24" r="8" fill="#7B6EF6"/>
+  <text x="44" y="29"
+        fill="#F0EFE8"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="18"
+        font-weight="500"
+        letter-spacing="0.2">memstore</text>
+</svg>
