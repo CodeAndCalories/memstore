@@ -3,6 +3,7 @@ const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const supabase = require('../config/supabase');
 const { clearCache } = require('../middleware/auth');
+const { Resend } = require('resend');
 
 const PLAN_LIMITS = {
   [process.env.STRIPE_STARTER_PRICE_ID]: { plan: 'starter', ops_limit: 50000 },
@@ -44,6 +45,96 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
           }).eq('id', agent.id);
           clearCache(agent.api_key_prefix);
           console.log(`Upgraded ${email} to ${limits.plan}`);
+
+          // Send upgrade confirmation email — fire and forget
+          try {
+            const resend = new Resend(process.env.RESEND_API_KEY);
+            const planLabel = limits.plan === 'pro' ? 'Pro' : 'Starter';
+            const opsFormatted = limits.ops_limit.toLocaleString();
+            resend.emails.send({
+              from: 'Memstore <hello@memstore.dev>',
+              to: email,
+              subject: 'Your Memstore plan has been upgraded',
+              html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#09090F;font-family:'DM Sans',Arial,sans-serif;color:#F0EFE8">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#09090F;padding:48px 0">
+    <tr>
+      <td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+
+          <!-- Logo -->
+          <tr>
+            <td style="padding:0 0 32px 0">
+              <span style="font-family:'Courier New',monospace;font-size:15px;font-weight:600;color:#F0EFE8">
+                <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7B6EF6;margin-right:6px"></span>
+                memstore
+              </span>
+            </td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background:#161624;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:40px">
+
+              <h1 style="margin:0 0 8px;font-size:24px;font-weight:600;color:#F0EFE8;line-height:1.2">
+                You're on the ${planLabel} plan
+              </h1>
+              <p style="margin:0 0 32px;font-size:15px;color:#8886A0;line-height:1.6">
+                Your account has been upgraded. Everything is ready — no changes needed to your code.
+              </p>
+
+              <!-- Plan box -->
+              <div style="background:#09090F;border:1px solid rgba(123,110,246,0.3);border-radius:10px;padding:20px 24px;margin-bottom:32px">
+                <p style="margin:0 0 4px;font-size:12px;font-weight:500;color:#8886A0;text-transform:uppercase;letter-spacing:0.08em">Your new plan</p>
+                <p style="margin:0 0 16px;font-size:22px;font-weight:600;color:#7B6EF6">${planLabel}</p>
+                <p style="margin:0 0 4px;font-size:12px;font-weight:500;color:#8886A0;text-transform:uppercase;letter-spacing:0.08em">Monthly operations</p>
+                <p style="margin:0;font-size:18px;font-weight:600;color:#F0EFE8">${opsFormatted} ops / month</p>
+              </div>
+
+              <!-- API key note -->
+              <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:14px 18px;margin-bottom:32px">
+                <p style="margin:0;font-size:13px;color:#34D399;line-height:1.6">
+                  <strong>Your API key stays the same.</strong><br>
+                  No need to update your code — just keep using the key you already have.
+                </p>
+              </div>
+
+              <!-- CTA -->
+              <a href="https://memstore.dev/quickstart.html"
+                 style="display:block;background:#7B6EF6;color:#fff;text-decoration:none;padding:13px 20px;border-radius:8px;font-size:14px;font-weight:500;text-align:center">
+                View quickstart guide &rarr;
+              </a>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 0 0;text-align:center">
+              <p style="margin:0;font-size:12px;color:#4A4860;line-height:1.6">
+                You're receiving this because you upgraded at memstore.dev.<br>
+                <a href="https://memstore.dev" style="color:#4A4860">memstore.dev</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+              `.trim(),
+            }).catch(err => console.error('upgrade email send error:', err.message));
+          } catch (err) {
+            console.error('upgrade email init error:', err.message);
+          }
         }
         break;
       }
