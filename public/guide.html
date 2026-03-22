@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persistent Memory for AI Agents: How to Make Your Agents Remember Across Runs — Memstore</title>
+<meta name="description" content="Learn how to add persistent memory to AI agents so they remember facts, preferences, and decisions across separate runs. No complex infrastructure required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;
+  --bg2:#0F0F1A;
+  --bg3:#13131F;
+  --surface:#161624;
+  --border:rgba(255,255,255,0.07);
+  --border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;
+  --muted:#8886A0;
+  --dim:#4A4860;
+  --brand:#7B6EF6;
+  --brand-dim:#3D3680;
+  --brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;
+  --amber:#F59E0B;
+  --green:#34D399;
+  --red:#F87171;
+  --radius:12px;
+  --font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+
+/* article layout */
+.article-hero{padding:120px 40px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.article-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px}
+.article-hero h1{font-family:var(--font-display);font-size:clamp(36px,5vw,60px);font-weight:400;line-height:1.1;letter-spacing:-0.02em;max-width:820px;margin:0 auto 24px}
+.article-hero h1 em{font-style:italic;color:var(--brand)}
+.article-meta{font-size:14px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.article-meta span{display:flex;align-items:center;gap:6px}
+
+/* article body */
+.article-wrap{max-width:740px;margin:0 auto;padding:0 40px 100px}
+
+.article-wrap h2{font-family:var(--font-display);font-size:clamp(26px,3.5vw,36px);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin:56px 0 16px;color:var(--text)}
+.article-wrap h3{font-size:20px;font-weight:600;margin:36px 0 12px;color:var(--text)}
+.article-wrap p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.article-wrap p strong{color:var(--text);font-weight:600}
+.article-wrap ul,.article-wrap ol{margin:0 0 20px 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.article-wrap ul li,.article-wrap ol li{font-size:16px;color:var(--muted);line-height:1.7;padding-left:24px;position:relative}
+.article-wrap ul li::before{content:'—';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono)}
+.article-wrap ol{counter-reset:ol-counter}
+.article-wrap ol li{counter-increment:ol-counter}
+.article-wrap ol li::before{content:counter(ol-counter)'.';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono);font-size:13px}
+
+/* code blocks */
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:24px 0}
+.code-label{background:var(--bg3);padding:10px 20px;font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.code-block pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted)}
+.code-block pre .kw{color:#C084FC}
+.code-block pre .str{color:#86EFAC}
+.code-block pre .key{color:#93C5FD}
+.code-block pre .cmt{color:var(--dim)}
+.code-block pre .fn{color:#67E8F9}
+.code-block pre .num{color:#FCD34D}
+.code-block pre .url{color:var(--teal)}
+
+/* callout / info box */
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:20px 24px;margin:28px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+
+/* divider */
+.article-wrap hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+
+/* endpoint pill list */
+.endpoint-list{display:flex;flex-direction:column;gap:8px;margin:20px 0 28px}
+.endpoint{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-family:var(--font-mono);font-size:13px}
+.method{padding:3px 8px;border-radius:5px;font-size:11px;font-weight:500;min-width:48px;text-align:center}
+.m-post{background:rgba(52,211,153,0.12);color:#34D399}
+.m-get{background:rgba(147,197,253,0.12);color:#93C5FD}
+.path{color:var(--muted)}
+
+/* CTA section */
+.article-cta{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;margin:64px 0 0}
+.article-cta h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;margin-bottom:12px}
+.article-cta p{color:var(--muted);font-size:16px;margin-bottom:28px}
+.btn-primary{display:inline-block;background:var(--brand);color:#fff;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#9080FF;transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,110,246,0.35)}
+
+/* footer */
+footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .article-hero{padding:100px 20px 48px}
+  .article-wrap{padding:0 20px 64px}
+  .article-cta{padding:36px 24px}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><span class="logo-dot"></span>memstore</a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<!-- HERO -->
+<div class="article-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="article-eyebrow">Guide</div>
+    <h1>Persistent Memory for AI Agents:<br><em>How to Make Your Agents Remember Across Runs</em></h1>
+    <div class="article-meta">
+      <span>10 min read</span>
+      <span>·</span>
+      <span>Agent Architecture</span>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="article-wrap">
+
+  <h2>What is persistent memory for AI agents?</h2>
+  <p>Persistent memory for AI agents is the ability for an agent to store, retrieve, and reuse information across separate executions. Instead of starting from scratch every time, the agent can recall past facts, user preferences, and decisions.</p>
+  <p>This is critical for building agents that feel consistent, personalized, and useful over time.</p>
+
+  <hr>
+
+  <h2>The Core Problem: AI Agents Forget Everything</h2>
+  <p>Most AI agents today are stateless.</p>
+  <p>Even if you're using:</p>
+  <ul>
+    <li>LangChain</li>
+    <li>CrewAI</li>
+    <li>AutoGen</li>
+    <li>Custom GPT workflows</li>
+  </ul>
+  <p>…your agent typically loses all context once the process ends.</p>
+  <p><strong>What this looks like in practice:</strong></p>
+  <ul>
+    <li>A customer support agent forgets past conversations</li>
+    <li>A personal assistant forgets user preferences</li>
+    <li>A sales agent forgets leads and prior interactions</li>
+    <li>A workflow agent repeats the same steps every run</li>
+  </ul>
+  <p>You end up re-prompting the same context over and over, which is:</p>
+  <ul>
+    <li>Inefficient</li>
+    <li>Expensive (more tokens)</li>
+    <li>Limiting for real-world applications</li>
+  </ul>
+
+  <hr>
+
+  <h2>Why Traditional "Memory" Isn't Enough</h2>
+  <p>Some frameworks offer short-term memory via conversation buffers, windowed context, or temporary state. But these approaches reset between runs, don't scale across sessions, and rely on prompt stuffing instead of true storage.</p>
+  <p>What you actually need is a persistent, queryable memory layer that exists <strong>outside</strong> the agent runtime.</p>
+
+  <hr>
+
+  <h2>The Solution: Persistent Memory via API</h2>
+  <p>The simplest way to add long-term memory to an AI agent is to use a memory API. Instead of relying on in-process state, your agent:</p>
+  <ul>
+    <li>Stores information when something important happens</li>
+    <li>Retrieves relevant memory when making decisions</li>
+  </ul>
+  <p>This mirrors how real memory works — store experiences, recall what matters later.</p>
+
+  <hr>
+
+  <h2>How It Works (Simple Architecture)</h2>
+  <p>At a high level:</p>
+  <ol>
+    <li>Agent runs</li>
+    <li>Agent calls API to store memory</li>
+    <li>Memory is embedded and stored</li>
+    <li>On next run, agent queries memory</li>
+    <li>Relevant results are returned</li>
+  </ol>
+  <p>This enables semantic search (not just keyword matching), cross-session continuity, and scalable memory storage.</p>
+
+  <hr>
+
+  <h2>Example: Storing Memory in Your Agent</h2>
+  <p>When your agent learns something important, you store it.</p>
+
+  <div class="code-block">
+    <div class="code-label">POST /v1/memory/remember</div>
+    <pre>curl -X POST https://memstore.dev/v1/memory/remember \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "content": "User prefers dark mode in dashboard settings"
+  }'</span></pre>
+  </div>
+
+  <p><strong>What happens behind the scenes:</strong></p>
+  <ul>
+    <li>The text is converted into an embedding</li>
+    <li>Stored in a vector database (pgvector)</li>
+    <li>Indexed for semantic search</li>
+  </ul>
+
+  <hr>
+
+  <h2>Example: Recalling Memory Later</h2>
+  <p>When your agent needs context, it searches memory.</p>
+
+  <div class="code-block">
+    <div class="code-label">GET /v1/memory/recall?q=...</div>
+    <pre>curl <span class="str">"https://memstore.dev/v1/memory/recall?q=user%20ui%20preferences"</span> \
+  -H <span class="str">"Authorization: Bearer YOUR_API_KEY"</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label">Response</div>
+    <pre>{
+  <span class="key">"results"</span>: [
+    {
+      <span class="key">"content"</span>: <span class="str">"User prefers dark mode in dashboard settings"</span>,
+      <span class="key">"score"</span>: <span class="num">0.92</span>
+    }
+  ]
+}</pre>
+  </div>
+
+  <div class="callout"><strong>Why this matters:</strong> Even though the query says "UI preferences," it still finds "dark mode" because the search is semantic, not keyword-based.</div>
+
+  <hr>
+
+  <h2>Adding Memory to an Agent (Pattern)</h2>
+  <p>The integration pattern is simple:</p>
+  <ul>
+    <li><strong>During execution:</strong> When something important happens → call <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">/remember</code></li>
+    <li><strong>Before decision-making:</strong> Call <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">/recall?q=...</code> with relevant query</li>
+    <li><strong>Inject results</strong> into your prompt or reasoning</li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-label">Pseudo Agent Flow</div>
+    <pre><span class="cmt"># Step 1: Recall memory</span>
+memories = <span class="fn">recall</span>(<span class="str">"user preferences"</span>)
+
+<span class="cmt"># Step 2: Add to prompt</span>
+context = <span class="fn">f</span><span class="str">"Relevant memory: {memories}"</span>
+
+<span class="cmt"># Step 3: Run agent with context</span>
+response = <span class="fn">llm</span>(prompt + context)
+
+<span class="cmt"># Step 4: Store new insights</span>
+<span class="fn">remember</span>(<span class="str">"User prefers shorter responses"</span>)</pre>
+  </div>
+
+  <p>This turns your agent from <strong>stateless → stateful</strong>.</p>
+
+  <hr>
+
+  <h2>Works with Any Agent Framework</h2>
+  <p>A major advantage of using a REST-based memory API is that it's framework agnostic. You can plug this into:</p>
+
+  <h3>LangChain</h3>
+  <ul>
+    <li>Use memory retrieval before chain execution</li>
+    <li>Store outputs as structured memory</li>
+  </ul>
+
+  <h3>CrewAI</h3>
+  <ul>
+    <li>Share memory across agents in a crew</li>
+    <li>Persist task results between runs</li>
+  </ul>
+
+  <h3>AutoGen</h3>
+  <ul>
+    <li>Maintain conversation history across sessions</li>
+    <li>Enable agents to "learn" over time</li>
+  </ul>
+
+  <h3>Custom Agents</h3>
+  <ul>
+    <li>No dependencies required</li>
+    <li>Just HTTP calls</li>
+  </ul>
+
+  <hr>
+
+  <h2>Why Developers Are Moving Toward Memory APIs</h2>
+
+  <h3>1. No More Prompt Bloat</h3>
+  <p>Stop stuffing past context into prompts manually.</p>
+
+  <h3>2. Lower Token Costs</h3>
+  <p>Store once, retrieve when needed.</p>
+
+  <h3>3. Better User Experience</h3>
+  <p>Agents remember preferences, history, and behavior.</p>
+
+  <h3>4. Scalable Architecture</h3>
+  <p>Memory lives outside your agent runtime.</p>
+
+  <hr>
+
+  <h2>Introducing Memstore: Persistent Memory for AI Agents</h2>
+  <p>Memstore is a simple REST API designed specifically for agent memory. Instead of building your own vector database, embedding pipeline, and retrieval system, you can store memory with one API call and retrieve relevant context with another.</p>
+
+  <p><strong>Why Memstore works well:</strong></p>
+  <ul>
+    <li>Built on pgvector for semantic search</li>
+    <li>Uses high-quality embeddings (text-embedding-3-small)</li>
+    <li>Dead simple API (remember + recall)</li>
+    <li>Works with any framework or custom stack</li>
+  </ul>
+
+  <div class="endpoint-list">
+    <div class="endpoint"><span class="method m-post">POST</span><span class="path">/v1/agents — create agent + get API key</span></div>
+    <div class="endpoint"><span class="method m-post">POST</span><span class="path">/v1/memory/remember — store a memory</span></div>
+    <div class="endpoint"><span class="method m-get">GET</span><span class="path">/v1/memory/recall?q=... — semantic search</span></div>
+    <div class="endpoint"><span class="method m-get">GET</span><span class="path">/v1/memory/list — list all memories</span></div>
+  </div>
+
+  <hr>
+
+  <h2>When Should You Store Memory?</h2>
+  <p><strong>Good candidates:</strong></p>
+  <ul>
+    <li>User preferences</li>
+    <li>Decisions made</li>
+    <li>Important facts</li>
+    <li>Summaries of interactions</li>
+    <li>Task outcomes</li>
+  </ul>
+  <p><strong>Avoid:</strong></p>
+  <ul>
+    <li>Raw logs</li>
+    <li>Redundant data</li>
+    <li>Low-signal noise</li>
+  </ul>
+  <div class="callout">Think of memory as: <strong>"What would be useful if the agent ran again tomorrow?"</strong></div>
+
+  <hr>
+
+  <h2>Best Practices for Persistent Memory</h2>
+
+  <h3>Keep Memory Atomic</h3>
+  <p>Store small, clear facts instead of large blobs.</p>
+
+  <h3>Use Meaningful Queries</h3>
+  <p>Ask questions like "user preferences", "past purchases", "recent decisions".</p>
+
+  <h3>Store After Key Events</h3>
+  <p>Don't store everything — store what matters.</p>
+
+  <hr>
+
+  <h2>Final Thoughts</h2>
+  <p>Persistent memory is one of the most important upgrades you can give an AI agent. Without it, agents reset every time. With it, they become adaptive, personalized, and consistent.</p>
+  <p>And the best part is, you don't need complex infrastructure to get started.</p>
+
+  <!-- CTA -->
+  <div class="article-cta">
+    <h2>Get Started with Memstore</h2>
+    <p>Start adding persistent memory to your agents in minutes. Free tier includes your first 1,000 memories.</p>
+    <a href="https://memstore.dev" class="btn-primary">Get your free API key &rarr;</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="logo-dot" style="width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block"></span>memstore</div>
+  <div class="footer-links">
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+    <a href="/blog/langchain-memory.html">Blog</a>
+  </div>
+  <div class="footer-legal">© 2025 Memstore</div>
+</footer>
+
+</body>
+</html>
