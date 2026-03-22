@@ -5,8 +5,6 @@ const { v4: uuidv4 } = require('uuid');
 const { Resend } = require('resend');
 const supabase = require('../config/supabase');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // POST /v1/agents — create a new agent + API key
 router.post('/', async (req, res) => {
   const { name, email } = req.body;
@@ -39,7 +37,9 @@ router.post('/', async (req, res) => {
   }
 
   // Send welcome email — fire and forget, don't block the response
-  resend.emails.send({
+  try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    resend.emails.send({
     from: 'Memstore <hello@memstore.dev>',
     to: email,
     subject: 'Your Memstore API Key',
@@ -143,7 +143,10 @@ router.post('/', async (req, res) => {
 </body>
 </html>
     `.trim(),
-  }).catch(err => console.error('resend error:', err.message));
+    }).catch(err => console.error('resend send error:', err.message));
+  } catch (err) {
+    console.error('resend init error:', err.message);
+  }
 
   // Return raw key ONCE — never stored again
   res.status(201).json({
