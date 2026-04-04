@@ -1,0 +1,11 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+memstore/__init__.py
+memstore/client.py
+memstore_client.egg-info/PKG-INFO
+memstore_client.egg-info/SOURCES.txt
+memstore_client.egg-info/dependency_links.txt
+memstore_client.egg-info/requires.txt
+memstore_client.egg-info/top_level.txt

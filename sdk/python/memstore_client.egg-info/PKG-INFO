@@ -1,0 +1,77 @@
+Metadata-Version: 2.4
+Name: memstore-client
+Version: 0.1.0
+Summary: Persistent memory API for AI agents
+Home-page: https://github.com/CodeAndCalories/memstore
+Author: Memstore
+Author-email: hello@memstore.dev
+License: MIT License — Memstore 2026
+        
+Project-URL: Homepage, https://memstore.dev
+Project-URL: Documentation, https://memstore.dev/docs/persistent-memory-ai-agents.html
+Project-URL: Repository, https://github.com/CodeAndCalories/memstore
+Project-URL: Bug Tracker, https://github.com/CodeAndCalories/memstore/issues
+Keywords: ai,agents,memory,langchain,crewai,autogen,llm,vector
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests>=2.28.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-python
+
+# memstore
+
+Persistent memory API for AI agents. Store and recall memory across runs in two lines.
+
+## Install
+
+```bash
+pip install memstore
+```
+
+## Usage
+
+```python
+from memstore import Memstore
+
+ms = Memstore(api_key="am_live_...")
+
+# Store a memory
+ms.remember("User prefers concise replies, works in fintech")
+
+# Recall relevant memories (semantic search)
+memories = ms.recall("user preferences")
+for m in memories:
+    print(m["content"], m["score"])
+
+# Scope by user/session
+ms.remember("Prefers Python over JS", session="user_42")
+memories = ms.recall("tech stack", session="user_42")
+```
+
+## API
+
+- `ms.remember(content, session=None, metadata=None, ttl=None)` — store a memory
+- `ms.recall(query, session=None, top_k=5, threshold=0.5)` — semantic search, returns list of memory dicts
+- `ms.forget(memory_id)` — delete a memory by ID
+- `ms.list(session=None, limit=20)` — list memories in reverse chronological order
+
+Get a free API key at [memstore.dev](https://memstore.dev) — 1,000 ops/month, no credit card required.
+
+## License
+
+MIT
