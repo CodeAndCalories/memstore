@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>How to Add Persistent Memory to AutoGen Agents — Memstore</title>
+<meta name="description" content="AutoGen agents forget everything between conversations. Learn how to add persistent long-term memory to your AutoGen multi-agent systems using a simple REST API.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;--bg2:#0F0F1A;--bg3:#13131F;--surface:#161624;
+  --border:rgba(255,255,255,0.07);--border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;--muted:#8886A0;--dim:#4A4860;
+  --brand:#7B6EF6;--brand-dim:#3D3680;--brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;--amber:#F59E0B;--green:#34D399;--red:#F87171;
+  --radius:12px;
+  --font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+.article-hero{padding:120px 40px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.article-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px}
+.article-hero h1{font-family:var(--font-display);font-size:clamp(36px,5vw,60px);font-weight:400;line-height:1.1;letter-spacing:-0.02em;max-width:820px;margin:0 auto 24px}
+.article-hero h1 em{font-style:italic;color:var(--brand)}
+.article-meta{font-size:14px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.article-wrap{max-width:740px;margin:0 auto;padding:0 40px 100px}
+.article-wrap h2{font-family:var(--font-display);font-size:clamp(26px,3.5vw,36px);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin:56px 0 16px;color:var(--text)}
+.article-wrap h3{font-size:20px;font-weight:600;margin:36px 0 12px;color:var(--text)}
+.article-wrap p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.article-wrap p strong{color:var(--text);font-weight:600}
+.article-wrap ul{margin:0 0 20px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.article-wrap ul li{font-size:16px;color:var(--muted);line-height:1.7;padding-left:24px;position:relative}
+.article-wrap ul li::before{content:'—';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono)}
+.article-wrap hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:24px 0}
+.code-label{background:var(--bg3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.code-label-text{font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase}
+.code-lang{font-size:11px;font-family:var(--font-mono);color:var(--brand);letter-spacing:0.06em}
+.code-block pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted)}
+.kw{color:#C084FC}.str{color:#86EFAC}.key{color:#93C5FD}.cmt{color:var(--dim)}.fn{color:#67E8F9}.num{color:#FCD34D}.cls{color:var(--amber)}
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:20px 24px;margin:28px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+.article-cta{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;margin:64px 0 0}
+.article-cta h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;margin-bottom:12px}
+.article-cta p{color:var(--muted);font-size:16px;margin-bottom:28px}
+.btn-primary{display:inline-block;background:var(--brand);color:#fff;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#9080FF;transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,110,246,0.35)}
+footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+@media(max-width:768px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .article-hero{padding:100px 20px 48px}.article-wrap{padding:0 20px 64px}
+  .article-cta{padding:36px 24px}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<div class="article-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="article-eyebrow">Blog · AutoGen</div>
+    <h1>How to Add Persistent Memory<br>to <em>AutoGen Agents</em></h1>
+    <div class="article-meta">
+      <span>9 min read</span>
+      <span>·</span>
+      <span>AutoGen · Multi-Agent · Python</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-wrap">
+
+  <p>Microsoft's AutoGen is one of the most powerful frameworks for building multi-agent systems. You can spin up a <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">ConversableAgent</code>, hand it tools, and watch agents negotiate solutions autonomously. But there's a hard limit baked into every AutoGen setup: <strong>when the conversation ends, all context is gone.</strong></p>
+  <p>The next conversation starts from zero. Your agent doesn't remember the user's preferences, the decisions it made last week, or the research it spent three API calls conducting. This tutorial shows you exactly how to fix that with Memstore's REST memory API.</p>
+
+  <hr>
+
+  <h2>Why AutoGen Doesn't Have Memory Out of the Box</h2>
+  <p>AutoGen manages conversation state through its <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">chat_messages</code> dict — a list of message objects that grows during a session. This is perfect for in-conversation coherence, but it's fundamentally an in-memory Python data structure. Once the process exits, it's gone.</p>
+  <p>AutoGen does offer a <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">TeachableAgent</code> that can write facts to a local SQLite database, but this approach has real limitations in production:</p>
+  <ul>
+    <li>It's local-only — can't share memory across multiple agent instances or servers</li>
+    <li>No semantic search — retrieval is keyword-based, not meaning-based</li>
+    <li>Not designed for multi-agent memory sharing</li>
+    <li>Doesn't work in serverless or containerized environments</li>
+  </ul>
+  <p>What you actually need is a dedicated memory layer that lives outside your agent process. That's exactly what Memstore provides.</p>
+
+  <hr>
+
+  <h2>The Architecture: AutoGen + Memstore</h2>
+  <p>The pattern is simple. Your AutoGen agents get two new tools: <strong>remember</strong> and <strong>recall</strong>. When an agent learns something worth keeping, it calls <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">remember()</code>. When it needs context at the start of a new session, it calls <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">recall()</code>.</p>
+  <p>Memstore handles the storage, vector indexing, and semantic retrieval. Your agent code stays clean.</p>
+
+  <h3>Step 1: Install dependencies and get your API key</h3>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">Install</span>
+      <span class="code-lang">bash</span>
+    </div>
+    <pre>pip install pyautogen requests</pre>
+  </div>
+
+  <p>Get your free API key at <strong>memstore.dev</strong>. The free tier gives you 1,000 memory operations per month — plenty to get started.</p>
+
+  <h3>Step 2: Create the memory tool functions</h3>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">memory_tools.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> requests
+<span class="kw">import</span> os
+
+MEMSTORE_KEY = os.<span class="fn">getenv</span>(<span class="str">"MEMSTORE_API_KEY"</span>)
+MEMSTORE_URL = <span class="str">"https://memstore.dev/v1/memory"</span>
+HEADERS = {<span class="str">"Authorization"</span>: <span class="str">f"Bearer {MEMSTORE_KEY}"</span>}
+
+<span class="kw">def</span> <span class="fn">remember</span>(content: str, tags: list[str] = <span class="kw">None</span>) -> str:
+    <span class="str">"""Store a memory in Memstore. Use this to save anything worth keeping
+    between sessions: user preferences, decisions, research findings, facts."""</span>
+    payload = {<span class="str">"content"</span>: content}
+    <span class="kw">if</span> tags:
+        payload[<span class="str">"tags"</span>] = tags
+    res = requests.<span class="fn">post</span>(
+        <span class="str">f"{MEMSTORE_URL}/remember"</span>,
+        json=payload,
+        headers=HEADERS
+    )
+    res.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> <span class="str">f"Memory stored (id: {res.json()['id']})"</span>
+
+<span class="kw">def</span> <span class="fn">recall</span>(query: str, limit: int = <span class="num">5</span>) -> str:
+    <span class="str">"""Search past memories relevant to a query. Returns the most semantically
+    similar stored memories. Use this at the start of sessions or when you
+    need context about a user or topic."""</span>
+    res = requests.<span class="fn">get</span>(
+        <span class="str">f"{MEMSTORE_URL}/recall"</span>,
+        params={<span class="str">"q"</span>: query, <span class="str">"limit"</span>: limit},
+        headers=HEADERS
+    )
+    res.<span class="fn">raise_for_status</span>()
+    memories = res.<span class="fn">json</span>().<span class="fn">get</span>(<span class="str">"memories"</span>, [])
+    <span class="kw">if not</span> memories:
+        <span class="kw">return</span> <span class="str">"No relevant memories found."</span>
+    <span class="kw">return</span> <span class="str">"\n"</span>.<span class="fn">join</span>([<span class="str">f"- {m['content']}"</span> <span class="kw">for</span> m <span class="kw">in</span> memories])</pre>
+  </div>
+
+  <h3>Step 3: Register tools with your AutoGen agents</h3>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">agent_setup.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> autogen
+<span class="kw">from</span> memory_tools <span class="kw">import</span> remember, recall
+
+config_list = [{<span class="str">"model"</span>: <span class="str">"gpt-4o"</span>, <span class="str">"api_key"</span>: <span class="str">"YOUR_OPENAI_KEY"</span>}]
+
+assistant = autogen.<span class="cls">AssistantAgent</span>(
+    name=<span class="str">"assistant"</span>,
+    llm_config={
+        <span class="str">"config_list"</span>: config_list,
+        <span class="str">"functions"</span>: [
+            {
+                <span class="str">"name"</span>: <span class="str">"remember"</span>,
+                <span class="str">"description"</span>: remember.__doc__,
+                <span class="str">"parameters"</span>: {
+                    <span class="str">"type"</span>: <span class="str">"object"</span>,
+                    <span class="str">"properties"</span>: {
+                        <span class="str">"content"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>},
+                        <span class="str">"tags"</span>: {<span class="str">"type"</span>: <span class="str">"array"</span>, <span class="str">"items"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>}}
+                    },
+                    <span class="str">"required"</span>: [<span class="str">"content"</span>]
+                }
+            },
+            {
+                <span class="str">"name"</span>: <span class="str">"recall"</span>,
+                <span class="str">"description"</span>: recall.__doc__,
+                <span class="str">"parameters"</span>: {
+                    <span class="str">"type"</span>: <span class="str">"object"</span>,
+                    <span class="str">"properties"</span>: {
+                        <span class="str">"query"</span>: {<span class="str">"type"</span>: <span class="str">"string"</span>},
+                        <span class="str">"limit"</span>: {<span class="str">"type"</span>: <span class="str">"integer"</span>}
+                    },
+                    <span class="str">"required"</span>: [<span class="str">"query"</span>]
+                }
+            }
+        ]
+    }
+)
+
+user_proxy = autogen.<span class="cls">UserProxyAgent</span>(
+    name=<span class="str">"user"</span>,
+    human_input_mode=<span class="str">"NEVER"</span>,
+    function_map={
+        <span class="str">"remember"</span>: remember,
+        <span class="str">"recall"</span>: recall
+    }
+)</pre>
+  </div>
+
+  <hr>
+
+  <h2>Using Memory Across Sessions</h2>
+  <p>The real power shows up when you prime each new conversation with relevant context. Before starting any conversation, inject a recall call to load what your agent already knows.</p>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">session_with_memory.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre"><span class="kw">def</span> <span class="fn">start_conversation_with_memory</span>(user_message: str, user_id: str):
+    <span class="cmt"># Load relevant context before starting</span>
+    past_context = <span class="fn">recall</span>(<span class="str">f"context for user {user_id}: {user_message}"</span>)
+
+    <span class="cmt"># Inject memory into the system prompt</span>
+    system_message = <span class="str">f"""You are a helpful assistant with persistent memory.
+
+Relevant context from past sessions:
+{past_context}
+
+Use this context to personalize your responses. When you learn new
+important facts, call remember() to store them for future sessions."""</span>
+
+    assistant.update_system_message(system_message)
+
+    user_proxy.<span class="fn">initiate_chat</span>(
+        assistant,
+        message=user_message
+    )</pre>
+  </div>
+
+  <div class="callout"><strong>Pro tip:</strong> Tag your memories by user ID or session type to make retrieval more precise. Call <code style="font-family:var(--font-mono);font-size:12px">remember(content, tags=["user:alice", "preference"])</code> and filter on recall.</div>
+
+  <hr>
+
+  <h2>Multi-Agent Memory Sharing</h2>
+  <p>Because Memstore is a shared API, multiple AutoGen agents can read from and write to the same memory store. A researcher agent can save findings that a writer agent uses in the next run — no manual coordination needed.</p>
+  <p>This is the fundamental difference from local memory solutions. Your memory layer is as scalable and accessible as any REST API — which means it works in distributed systems, serverless functions, and across team members' local environments.</p>
+
+  <div class="article-cta">
+    <h2>Give your AutoGen agents a memory.</h2>
+    <p>One API. Persistent context across every session. Free to start.</p>
+    <a href="https://memstore.dev" class="btn-primary">Get your free API key &rarr;</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="logo-dot"></span>memstore</div>
+  <div class="footer-links">
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+    <a href="/blog/langchain-memory.html">Blog</a>
+  </div>
+  <div class="footer-legal">© 2025 Memstore</div>
+</footer>
+
+</body>
+</html>

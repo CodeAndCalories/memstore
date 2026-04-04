@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Why Your AI Agent Needs a Vector Database — Memstore</title>
+<meta name="description" content="Vector databases power semantic memory retrieval in AI agents. Learn how embeddings and vector search work, and why they're essential for intelligent agent memory.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;--bg2:#0F0F1A;--bg3:#13131F;--surface:#161624;
+  --border:rgba(255,255,255,0.07);--border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;--muted:#8886A0;--dim:#4A4860;
+  --brand:#7B6EF6;--brand-dim:#3D3680;--brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;--amber:#F59E0B;--green:#34D399;--red:#F87171;
+  --radius:12px;
+  --font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+.article-hero{padding:120px 40px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.article-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px}
+.article-hero h1{font-family:var(--font-display);font-size:clamp(36px,5vw,60px);font-weight:400;line-height:1.1;letter-spacing:-0.02em;max-width:820px;margin:0 auto 24px}
+.article-hero h1 em{font-style:italic;color:var(--brand)}
+.article-meta{font-size:14px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.article-wrap{max-width:740px;margin:0 auto;padding:0 40px 100px}
+.article-wrap h2{font-family:var(--font-display);font-size:clamp(26px,3.5vw,36px);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin:56px 0 16px;color:var(--text)}
+.article-wrap h3{font-size:20px;font-weight:600;margin:36px 0 12px;color:var(--text)}
+.article-wrap p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.article-wrap p strong{color:var(--text);font-weight:600}
+.article-wrap ul{margin:0 0 20px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.article-wrap ul li{font-size:16px;color:var(--muted);line-height:1.7;padding-left:24px;position:relative}
+.article-wrap ul li::before{content:'—';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono)}
+.article-wrap hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:24px 0}
+.code-label{background:var(--bg3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.code-label-text{font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase}
+.code-lang{font-size:11px;font-family:var(--font-mono);color:var(--brand);letter-spacing:0.06em}
+.code-block pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted)}
+.kw{color:#C084FC}.str{color:#86EFAC}.key{color:#93C5FD}.cmt{color:var(--dim)}.fn{color:#67E8F9}.num{color:#FCD34D}.cls{color:var(--amber)}
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:20px 24px;margin:28px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+.analogy-box{background:var(--bg3);border:1px solid var(--border-bright);border-radius:var(--radius);padding:24px 28px;margin:28px 0}
+.analogy-box .label{font-size:11px;font-family:var(--font-mono);color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px}
+.analogy-box p{font-size:16px;color:var(--text);margin:0;line-height:1.65}
+.article-cta{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;margin:64px 0 0}
+.article-cta h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;margin-bottom:12px}
+.article-cta p{color:var(--muted);font-size:16px;margin-bottom:28px}
+.btn-primary{display:inline-block;background:var(--brand);color:#fff;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#9080FF;transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,110,246,0.35)}
+footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+@media(max-width:768px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .article-hero{padding:100px 20px 48px}.article-wrap{padding:0 20px 64px}
+  .article-cta{padding:36px 24px}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<div class="article-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="article-eyebrow">Blog · Concepts</div>
+    <h1>Why Your AI Agent Needs<br>a <em>Vector Database</em></h1>
+    <div class="article-meta">
+      <span>10 min read</span>
+      <span>·</span>
+      <span>Embeddings · Semantic Search · Memory Architecture</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-wrap">
+
+  <p>If you've started building AI agents, you've probably heard the term "vector database" thrown around. Maybe you've looked at Pinecone, Weaviate, or Chroma and thought: do I really need this? Can't I just use PostgreSQL?</p>
+  <p>The short answer is: for agent memory, <strong>regular databases are the wrong tool</strong>. Understanding why requires a quick look at how language models represent meaning — and why that changes what "search" means.</p>
+
+  <hr>
+
+  <h2>What Is an Embedding?</h2>
+  <p>Every time a language model processes text, it converts that text into a list of numbers — a vector. These numbers don't represent individual words. They represent <em>meaning</em>. Semantically similar text produces numerically similar vectors, even if the words are completely different.</p>
+
+  <div class="analogy-box">
+    <div class="label">Intuition</div>
+    <p>"The user prefers terse answers" and "Keep responses short" are different strings, but they express the same idea. In embedding space, their vectors are very close together. A semantic search for either phrase would return both. A LIKE query would return neither.</p>
+  </div>
+
+  <p>Embeddings typically have 768 to 1536 dimensions. Each dimension captures some aspect of meaning that no human engineer would think to encode manually. The model learns these representations from training on billions of text examples.</p>
+
+  <hr>
+
+  <h2>Why Regular Databases Fail at Memory Retrieval</h2>
+  <p>Imagine your agent has stored 10,000 memories over months of operation. A user asks: "what do you know about my development environment?" You need to find the relevant memories.</p>
+
+  <h3>The keyword approach</h3>
+  <p>A SQL query like <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">WHERE content LIKE '%development environment%'</code> will miss memories stored as "Mac with M3 chip, prefer zsh", "using VSCode, not vim", and "works on backend services in Go". These are all about the development environment, but none of them contain that phrase.</p>
+
+  <h3>The semantic approach</h3>
+  <p>A vector search computes the embedding of your query, then finds stored memories whose embeddings are closest to that query vector. It returns the memories that <em>mean the same thing</em>, regardless of what words were used. "Mac with M3 chip" and "development setup" are close in embedding space. The search finds them.</p>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">What vector search enables</span>
+      <span class="code-lang">concept</span>
+    </div>
+    <pre><span class="cmt"># These memories all get returned for query: "development environment"</span>
+memories = [
+    <span class="str">"User works on a MacBook Pro M3, 32GB RAM"</span>,
+    <span class="str">"Prefers zsh with oh-my-zsh over bash"</span>,
+    <span class="str">"Uses VSCode with Vim keybindings extension"</span>,
+    <span class="str">"Runs Docker Desktop, often hits memory limits"</span>,
+    <span class="str">"Main language is Python 3.11, secondary is Go"</span>
+]
+
+<span class="cmt"># None of these contain "development environment"</span>
+<span class="cmt"># A keyword search returns zero results</span>
+<span class="cmt"># A vector search returns all five — correctly</span></pre>
+  </div>
+
+  <hr>
+
+  <h2>How Vector Databases Work Under the Hood</h2>
+  <p>A vector database stores your text alongside its embedding vector. When you search, it:</p>
+  <ul>
+    <li>Embeds your query using the same embedding model used for storage</li>
+    <li>Computes similarity between your query vector and every stored vector</li>
+    <li>Returns the top-K most similar results, ranked by cosine similarity or dot product</li>
+  </ul>
+  <p>The challenge is doing this efficiently at scale. Comparing a query against millions of vectors naively would be too slow. Vector databases use approximate nearest neighbor (ANN) algorithms — like HNSW (Hierarchical Navigable Small World graphs) — to return results in milliseconds even with enormous datasets.</p>
+
+  <h3>Cosine similarity</h3>
+  <p>The most common similarity metric for text embeddings is cosine similarity. It measures the angle between two vectors, not their magnitude. Two semantically similar sentences score near 1.0; unrelated sentences score near 0. This metric is robust to differences in sentence length.</p>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">Cosine similarity (simplified)</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">cosine_similarity</span>(vec_a, vec_b):
+    <span class="str">"""Returns a value from 0 (unrelated) to 1 (identical meaning)."""</span>
+    dot = np.<span class="fn">dot</span>(vec_a, vec_b)
+    norms = np.<span class="fn">linalg.norm</span>(vec_a) * np.<span class="fn">linalg.norm</span>(vec_b)
+    <span class="kw">return</span> dot / norms
+
+<span class="cmt"># Example similarity scores (conceptual)</span>
+<span class="cmt"># "user likes Python" vs "prefers Python over Java"  → 0.91</span>
+<span class="cmt"># "user likes Python" vs "user prefers terse answers" → 0.23</span>
+<span class="cmt"># "user likes Python" vs "the weather in Seattle"     → 0.08</span></pre>
+  </div>
+
+  <hr>
+
+  <h2>Building Your Own vs. Using a Memory API</h2>
+  <p>You can absolutely build this yourself. The stack looks like this:</p>
+  <ul>
+    <li>OpenAI <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">text-embedding-3-small</code> or a local model to generate embeddings</li>
+    <li>Pinecone, Qdrant, or pgvector to store and query vectors</li>
+    <li>Your own logic for memory write, retrieval, and pruning</li>
+    <li>Infrastructure to keep it running and available</li>
+  </ul>
+  <p>This is a valid approach for large teams with specific requirements. But for most developers building agents, it's significant overhead that distracts from the actual product.</p>
+  <p>Memstore handles the entire stack: embedding generation, vector storage, ANN indexing, and retrieval — exposed as two simple HTTP endpoints. You call <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">POST /v1/memory/remember</code> to write and <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">GET /v1/memory/recall?q=...</code> to semantically search.</p>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">Semantic memory in 10 lines</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> requests
+
+HEADERS = {<span class="str">"Authorization"</span>: <span class="str">"Bearer YOUR_API_KEY"</span>}
+
+<span class="cmt"># Store a memory (automatically embedded)</span>
+requests.<span class="fn">post</span>(<span class="str">"https://memstore.dev/v1/memory/remember"</span>,
+    json={<span class="str">"content"</span>: <span class="str">"User prefers Python, dislikes Java verbosity"</span>},
+    headers=HEADERS
+)
+
+<span class="cmt"># Semantic search — finds it even with different phrasing</span>
+results = requests.<span class="fn">get</span>(<span class="str">"https://memstore.dev/v1/memory/recall"</span>,
+    params={<span class="str">"q"</span>: <span class="str">"what programming language does the user like?"</span>},
+    headers=HEADERS
+)
+<span class="cmt"># Returns: "User prefers Python, dislikes Java verbosity"</span></pre>
+  </div>
+
+  <div class="callout"><strong>The key insight:</strong> You're not searching for keywords — you're searching for meaning. That's what makes agent memory feel intelligent rather than mechanical.</div>
+
+  <hr>
+
+  <h2>When You Actually Need Your Own Vector DB</h2>
+  <p>A managed memory API like Memstore is the right choice for most agent builders. You'd want to run your own vector infrastructure if you have strict data residency requirements, need to store millions of documents (not just agent memories), or are building a RAG system over your entire document corpus. For agent memory — user preferences, task history, learned facts — a managed API is almost always the better call.</p>
+
+  <div class="article-cta">
+    <h2>Semantic memory, without the infrastructure.</h2>
+    <p>Memstore handles embeddings and vector search so you don't have to. Free to start.</p>
+    <a href="https://memstore.dev" class="btn-primary">Get your API key &rarr;</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="logo-dot"></span>memstore</div>
+  <div class="footer-links">
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+    <a href="/blog/langchain-memory.html">Blog</a>
+  </div>
+  <div class="footer-legal">© 2025 Memstore</div>
+</footer>
+
+</body>
+</html>
