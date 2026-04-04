@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Using OpenAI Function Calling with Persistent Memory — Memstore</title>
+<meta name="description" content="Wire up OpenAI function calling to Memstore's memory API. A step-by-step tutorial to give GPT-4 agents persistent long-term memory using tool use.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;--bg2:#0F0F1A;--bg3:#13131F;--surface:#161624;
+  --border:rgba(255,255,255,0.07);--border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;--muted:#8886A0;--dim:#4A4860;
+  --brand:#7B6EF6;--brand-dim:#3D3680;--brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;--amber:#F59E0B;--green:#34D399;--red:#F87171;
+  --radius:12px;
+  --font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+.article-hero{padding:120px 40px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.article-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px}
+.article-hero h1{font-family:var(--font-display);font-size:clamp(36px,5vw,60px);font-weight:400;line-height:1.1;letter-spacing:-0.02em;max-width:820px;margin:0 auto 24px}
+.article-hero h1 em{font-style:italic;color:var(--brand)}
+.article-meta{font-size:14px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.article-wrap{max-width:740px;margin:0 auto;padding:0 40px 100px}
+.article-wrap h2{font-family:var(--font-display);font-size:clamp(26px,3.5vw,36px);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin:56px 0 16px;color:var(--text)}
+.article-wrap h3{font-size:20px;font-weight:600;margin:36px 0 12px;color:var(--text)}
+.article-wrap p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.article-wrap p strong{color:var(--text);font-weight:600}
+.article-wrap ul{margin:0 0 20px;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.article-wrap ul li{font-size:16px;color:var(--muted);line-height:1.7;padding-left:24px;position:relative}
+.article-wrap ul li::before{content:'—';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono)}
+.article-wrap hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:24px 0}
+.code-label{background:var(--bg3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.code-label-text{font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase}
+.code-lang{font-size:11px;font-family:var(--font-mono);color:var(--brand);letter-spacing:0.06em}
+.code-block pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted)}
+.kw{color:#C084FC}.str{color:#86EFAC}.key{color:#93C5FD}.cmt{color:var(--dim)}.fn{color:#67E8F9}.num{color:#FCD34D}.cls{color:var(--amber)}
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:20px 24px;margin:28px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--brand-dim);border:1px solid rgba(123,110,246,0.4);font-size:13px;font-weight:600;color:var(--brand);font-family:var(--font-mono);margin-right:12px;flex-shrink:0}
+.step-header{display:flex;align-items:center;margin:36px 0 12px}
+.step-header h3{font-size:20px;font-weight:600;color:var(--text);margin:0}
+.article-cta{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;margin:64px 0 0}
+.article-cta h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;margin-bottom:12px}
+.article-cta p{color:var(--muted);font-size:16px;margin-bottom:28px}
+.btn-primary{display:inline-block;background:var(--brand);color:#fff;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#9080FF;transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,110,246,0.35)}
+footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+@media(max-width:768px){
+  nav{padding:0 20px}.nav-links{display:none}
+  .article-hero{padding:100px 20px 48px}.article-wrap{padding:0 20px 64px}
+  .article-cta{padding:36px 24px}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<div class="article-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="article-eyebrow">Blog · OpenAI · Tutorial</div>
+    <h1>Using OpenAI Function Calling<br>with <em>Persistent Memory</em></h1>
+    <div class="article-meta">
+      <span>11 min read</span>
+      <span>·</span>
+      <span>OpenAI · Function Calling · Python</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-wrap">
+
+  <p>OpenAI's function calling (now called "tool use") is one of the most powerful features in the API. It lets GPT-4 decide when to call external functions and how to use their results — turning a chat completion into an autonomous agent loop. But there's one capability that's conspicuously absent from every toy example: <strong>the agent can't remember anything between API calls.</strong></p>
+  <p>In this tutorial, we'll wire up OpenAI function calling to Memstore's memory API. By the end, your agent will be able to store memories when it learns something important, and recall relevant context at the start of every new conversation.</p>
+
+  <hr>
+
+  <h2>Prerequisites</h2>
+  <ul>
+    <li>An OpenAI API key (any tier works)</li>
+    <li>A Memstore API key — get one free at memstore.dev</li>
+    <li>Python 3.9+ with <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">openai</code> and <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">requests</code> installed</li>
+  </ul>
+
+  <hr>
+
+  <h2>How OpenAI Tool Use Works</h2>
+  <p>When you pass a <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">tools</code> array to the OpenAI chat completions API, the model can respond with a <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">tool_calls</code> field instead of (or alongside) its message content. Your code executes the function, passes the result back, and the model continues its response.</p>
+  <p>The model decides autonomously when to call a tool. If you give it a <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">remember</code> tool with a good description, it will call it when it judges something worth storing. Same with <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">recall</code>.</p>
+
+  <hr>
+
+  <h2>Building the Memory Agent</h2>
+
+  <div class="step-header">
+    <span class="step-badge">1</span>
+    <h3>Define the memory tool schemas</h3>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">tools.py — tool definitions</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre>MEMORY_TOOLS = [
+    {
+        <span class="str">"type"</span>: <span class="str">"function"</span>,
+        <span class="str">"function"</span>: {
+            <span class="str">"name"</span>: <span class="str">"remember"</span>,
+            <span class="str">"description"</span>: (
+                <span class="str">"Store a memory for future conversations. Use this whenever you learn "</span>
+                <span class="str">"something important about the user, their preferences, goals, decisions, "</span>
+                <span class="str">"or anything else worth remembering across sessions."</span>
+            ),
+            <span class="str">"parameters"</span>: {
+                <span class="str">"type"</span>: <span class="str">"object"</span>,
+                <span class="str">"properties"</span>: {
+                    <span class="str">"content"</span>: {
+                        <span class="str">"type"</span>: <span class="str">"string"</span>,
+                        <span class="str">"description"</span>: <span class="str">"The memory to store, written as a clear factual statement."</span>
+                    },
+                    <span class="str">"importance"</span>: {
+                        <span class="str">"type"</span>: <span class="str">"string"</span>,
+                        <span class="str">"enum"</span>: [<span class="str">"low"</span>, <span class="str">"medium"</span>, <span class="str">"high"</span>],
+                        <span class="str">"description"</span>: <span class="str">"How important this memory is to retain."</span>
+                    }
+                },
+                <span class="str">"required"</span>: [<span class="str">"content"</span>]
+            }
+        }
+    },
+    {
+        <span class="str">"type"</span>: <span class="str">"function"</span>,
+        <span class="str">"function"</span>: {
+            <span class="str">"name"</span>: <span class="str">"recall"</span>,
+            <span class="str">"description"</span>: (
+                <span class="str">"Search past memories for context relevant to the current conversation. "</span>
+                <span class="str">"Use this when you need to remember user preferences or past decisions."</span>
+            ),
+            <span class="str">"parameters"</span>: {
+                <span class="str">"type"</span>: <span class="str">"object"</span>,
+                <span class="str">"properties"</span>: {
+                    <span class="str">"query"</span>: {
+                        <span class="str">"type"</span>: <span class="str">"string"</span>,
+                        <span class="str">"description"</span>: <span class="str">"What you want to remember. Use natural language."</span>
+                    },
+                    <span class="str">"limit"</span>: {
+                        <span class="str">"type"</span>: <span class="str">"integer"</span>,
+                        <span class="str">"description"</span>: <span class="str">"Maximum number of memories to return (default 5)."</span>
+                    }
+                },
+                <span class="str">"required"</span>: [<span class="str">"query"</span>]
+            }
+        }
+    }
+]</pre>
+  </div>
+
+  <div class="step-header">
+    <span class="step-badge">2</span>
+    <h3>Implement the tool functions</h3>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">memory.py — tool implementations</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> requests, json, os
+
+MEMSTORE_KEY = os.<span class="fn">getenv</span>(<span class="str">"MEMSTORE_API_KEY"</span>)
+BASE_URL = <span class="str">"https://memstore.dev/v1/memory"</span>
+HEADERS = {<span class="str">"Authorization"</span>: <span class="str">f"Bearer {MEMSTORE_KEY}"</span>}
+
+<span class="kw">def</span> <span class="fn">remember</span>(content: str, importance: str = <span class="str">"medium"</span>) -> dict:
+    r = requests.<span class="fn">post</span>(
+        <span class="str">f"{BASE_URL}/remember"</span>,
+        json={<span class="str">"content"</span>: content, <span class="str">"metadata"</span>: {<span class="str">"importance"</span>: importance}},
+        headers=HEADERS
+    )
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> {<span class="str">"status"</span>: <span class="str">"stored"</span>, <span class="str">"id"</span>: r.<span class="fn">json</span>()[<span class="str">"id"</span>]}
+
+<span class="kw">def</span> <span class="fn">recall</span>(query: str, limit: int = <span class="num">5</span>) -> dict:
+    r = requests.<span class="fn">get</span>(
+        <span class="str">f"{BASE_URL}/recall"</span>,
+        params={<span class="str">"q"</span>: query, <span class="str">"limit"</span>: limit},
+        headers=HEADERS
+    )
+    r.<span class="fn">raise_for_status</span>()
+    memories = r.<span class="fn">json</span>().<span class="fn">get</span>(<span class="str">"memories"</span>, [])
+    <span class="kw">return</span> {<span class="str">"memories"</span>: [m[<span class="str">"content"</span>] <span class="kw">for</span> m <span class="kw">in</span> memories]}
+
+<span class="kw">def</span> <span class="fn">dispatch_tool</span>(name: str, arguments: str) -> str:
+    args = json.<span class="fn">loads</span>(arguments)
+    <span class="kw">if</span> name == <span class="str">"remember"</span>:
+        result = <span class="fn">remember</span>(**args)
+    <span class="kw">elif</span> name == <span class="str">"recall"</span>:
+        result = <span class="fn">recall</span>(**args)
+    <span class="kw">else</span>:
+        result = {<span class="str">"error"</span>: <span class="str">f"Unknown tool: {name}"</span>}
+    <span class="kw">return</span> json.<span class="fn">dumps</span>(result)</pre>
+  </div>
+
+  <div class="step-header">
+    <span class="step-badge">3</span>
+    <h3>Build the agent loop</h3>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">agent.py — the main agent loop</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+<span class="kw">from</span> tools <span class="kw">import</span> MEMORY_TOOLS
+<span class="kw">from</span> memory <span class="kw">import</span> dispatch_tool
+
+client = <span class="cls">OpenAI</span>()
+
+SYSTEM_PROMPT = <span class="str">"""You are a helpful personal assistant with long-term memory.
+
+At the start of every conversation, recall relevant context about the user
+and what you've discussed before. During conversations, remember new facts,
+preferences, and decisions you learn about the user.
+
+Use the remember() tool proactively — don't wait to be asked."""</span>
+
+<span class="kw">def</span> <span class="fn">chat</span>(user_message: str, conversation_history: list = <span class="kw">None</span>) -> str:
+    messages = conversation_history <span class="kw">or</span> [{
+        <span class="str">"role"</span>: <span class="str">"system"</span>,
+        <span class="str">"content"</span>: SYSTEM_PROMPT
+    }]
+    messages.<span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: user_message})
+
+    <span class="kw">while</span> <span class="kw">True</span>:
+        response = client.chat.completions.<span class="fn">create</span>(
+            model=<span class="str">"gpt-4o"</span>,
+            messages=messages,
+            tools=MEMORY_TOOLS,
+            tool_choice=<span class="str">"auto"</span>
+        )
+        msg = response.choices[<span class="num">0</span>].message
+        messages.<span class="fn">append</span>(msg)
+
+        <span class="kw">if not</span> msg.tool_calls:
+            <span class="kw">return</span> msg.content  <span class="cmt"># Done — return final response</span>
+
+        <span class="cmt"># Execute each tool call and append results</span>
+        <span class="kw">for</span> call <span class="kw">in</span> msg.tool_calls:
+            result = <span class="fn">dispatch_tool</span>(call.function.name, call.function.arguments)
+            messages.<span class="fn">append</span>({
+                <span class="str">"role"</span>: <span class="str">"tool"</span>,
+                <span class="str">"tool_call_id"</span>: call.id,
+                <span class="str">"content"</span>: result
+            })
+        <span class="cmt"># Loop: model sees tool results and continues</span>
+
+<span class="cmt"># Usage</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    print(<span class="fn">chat</span>(<span class="str">"Hi! I'm building a Python API, what should I use?"</span>))
+    <span class="cmt"># Agent recalls prior sessions, stores new facts automatically</span></pre>
+  </div>
+
+  <hr>
+
+  <h2>The Tool Call Loop in Detail</h2>
+  <p>The <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">while True</code> loop is the key insight. OpenAI's model may make multiple tool calls in a single "turn" — for example, calling <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">recall</code> to load context, generating a response, then calling <code style="font-family:var(--font-mono);font-size:13px;color:var(--brand)">remember</code> to save something it learned. Each tool result gets appended to the message history, and the loop continues until the model returns a plain text response.</p>
+
+  <div class="callout"><strong>Tool description quality matters:</strong> The model decides when to call your tools based entirely on their descriptions. Write them like docstrings for a human teammate — explain not just what the function does, but <em>when</em> to use it.</div>
+
+  <hr>
+
+  <h2>Testing the Memory</h2>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">Verify memory persists across sessions</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre"><span class="cmt"># Session 1</span>
+response1 = <span class="fn">chat</span>(<span class="str">"I'm working on a FastAPI backend, using PostgreSQL and Redis."</span>)
+print(response1)  <span class="cmt"># Agent stores the tech stack</span>
+
+<span class="cmt"># Session 2 — fresh conversation history</span>
+response2 = <span class="fn">chat</span>(<span class="str">"What database should I use for caching?"</span>)
+print(response2)
+<span class="cmt"># Agent recalls "using Redis", recommends Redis without being told again</span></pre>
+  </div>
+
+  <div class="article-cta">
+    <h2>Ready to build a memory-powered agent?</h2>
+    <p>Get your Memstore API key and ship persistent memory in under an hour.</p>
+    <a href="https://memstore.dev" class="btn-primary">Get your free API key &rarr;</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="logo-dot"></span>memstore</div>
+  <div class="footer-links">
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+    <a href="/blog/langchain-memory.html">Blog</a>
+  </div>
+  <div class="footer-legal">© 2025 Memstore</div>
+</footer>
+
+</body>
+</html>
