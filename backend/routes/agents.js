@@ -5,12 +5,62 @@ const { v4: uuidv4 } = require('uuid');
 const { Resend } = require('resend');
 const supabase = require('../config/supabase');
 
+// ── IP rate limiter: max 3 signups per IP per 24 hours ────────────────────────
+const ipSignupCounts = new Map(); // ip -> { count, windowStart }
+const IP_WINDOW_MS = 24 * 60 * 60 * 1000;
+const IP_MAX = 3;
+
+function checkIpLimit(ip) {
+  const now = Date.now();
+  const entry = ipSignupCounts.get(ip);
+  if (!entry || now - entry.windowStart >= IP_WINDOW_MS) {
+    ipSignupCounts.set(ip, { count: 1, windowStart: now });
+    return true;
+  }
+  if (entry.count >= IP_MAX) return false;
+  entry.count++;
+  return true;
+}
+
+// ── Disposable email domain blocklist ─────────────────────────────────────────
+const BLOCKED_DOMAINS = new Set([
+  'mailinator.com',
+  'tempmail.com',
+  'guerrillamail.com',
+  'throwaway.email',
+  'yopmail.com',
+  'sharklasers.com',
+  'guerrillamailblock.com',
+]);
+
+function isDisposableEmail(email) {
+  const domain = email.split('@')[1]?.toLowerCase();
+  return domain ? BLOCKED_DOMAINS.has(domain) : false;
+}
+
 // POST /v1/agents — create a new agent + API key
 router.post('/', async (req, res) => {
   const { name, email } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: 'email_required', message: 'email is required.' });
+  }
+
+  // Block disposable email domains
+  if (isDisposableEmail(email)) {
+    return res.status(400).json({
+      error: 'disposable_email',
+      message: 'Please use a permanent email address.',
+    });
+  }
+
+  // IP-based signup rate limit
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  if (!checkIpLimit(clientIp)) {
+    return res.status(429).json({
+      error: 'ip_rate_limit',
+      message: 'Too many accounts created from this IP. Try again tomorrow.',
+    });
   }
 
   // Generate API key: am_live_<random>

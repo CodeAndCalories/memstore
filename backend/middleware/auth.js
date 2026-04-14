@@ -6,6 +6,24 @@ const { sendUsageAlert } = require('../services/email');
 const keyCache = new Map(); // prefix -> { agentId, plan, ops_used, ops_limit, email, name }
 const CACHE_TTL = 60 * 1000; // 1 minute
 
+// ── Hourly per-key rate limits ────────────────────────────────────────────────
+const HOURLY_LIMITS = { free: 100, starter: 1000, pro: 5000 };
+const HOUR_MS = 60 * 60 * 1000;
+const hourlyCounters = new Map(); // prefix -> { count, windowStart }
+
+function checkHourlyLimit(prefix, plan) {
+  const limit = HOURLY_LIMITS[plan] ?? HOURLY_LIMITS.free;
+  const now = Date.now();
+  const entry = hourlyCounters.get(prefix);
+  if (!entry || now - entry.windowStart >= HOUR_MS) {
+    hourlyCounters.set(prefix, { count: 1, windowStart: now });
+    return true;
+  }
+  if (entry.count >= limit) return false;
+  entry.count++;
+  return true;
+}
+
 // Track which agents have already received an 80% alert this process lifetime.
 // Key: `${agentId}:${year}-${month}` — prevents repeated emails on every request.
 const alertedAgents = new Set();
@@ -51,6 +69,14 @@ async function auth(req, res, next) {
       });
     }
 
+    // Hourly request rate limit
+    if (!checkHourlyLimit(prefix, cached.plan)) {
+      return res.status(429).json({
+        error: 'hourly_rate_limit',
+        message: 'Hourly rate limit reached. Upgrade your plan for higher limits.',
+      });
+    }
+
     // Fire 80% alert async — do not await, must not block the request
     if (shouldSendUsageAlert(cached.agentId, cached.ops_used, cached.ops_limit)) {
       sendUsageAlert({
@@ -93,6 +119,14 @@ async function auth(req, res, next) {
   // Cache it
   keyCache.set(prefix, { ...data, agentId: data.id, hash: data.api_key, ts: Date.now() });
   req.agent = { ...data, agentId: data.id };
+
+  // Hourly request rate limit
+  if (!checkHourlyLimit(prefix, data.plan)) {
+    return res.status(429).json({
+      error: 'hourly_rate_limit',
+      message: 'Hourly rate limit reached. Upgrade your plan for higher limits.',
+    });
+  }
 
   // Fire 80% alert async — do not await, must not block the request
   if (shouldSendUsageAlert(data.id, data.ops_used, data.ops_limit)) {

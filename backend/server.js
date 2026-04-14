@@ -5,6 +5,9 @@ const path = require('path');
 
 const app = express();
 
+// Trust the first proxy hop (Railway, etc.) so req.ip reflects the real client IP
+app.set('trust proxy', 1);
+
 app.use(cors());
 
 // Stripe webhook MUST come before express.json() — needs raw body
