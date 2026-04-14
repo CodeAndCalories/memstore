@@ -52,6 +52,88 @@ curl "https://memstore.dev/v1/memory/recall?q=what+language+does+the+user+prefer
 
 ---
 
+## SDKs
+
+### Python
+
+```bash
+pip install memstore
+```
+
+```python
+from memstore import Memstore
+ms = Memstore(api_key="am_live_...")
+ms.remember("User prefers concise replies")
+memories = ms.recall("user preferences")
+```
+
+### Node.js
+
+```bash
+npm install memstore
+```
+
+```js
+const { Memstore } = require('memstore');
+const ms = new Memstore({ apiKey: 'am_live_...' });
+await ms.remember('User prefers concise replies');
+const memories = await ms.recall('user preferences');
+```
+
+See [`sdk/python/`](sdk/python/) and [`sdk/node/`](sdk/node/) for full docs.
+
+---
+
+## MCP Server (Claude, Cursor, and other agents)
+
+Memstore ships a native [Model Context Protocol](https://modelcontextprotocol.io/) server so you can give any MCP-compatible agent access to persistent memory as a first-class tool.
+
+### Claude Desktop / Claude Code
+
+Add to your `claude_desktop_config.json` (or `~/.claude/settings.json` for Claude Code):
+
+```json
+{
+  "mcpServers": {
+    "memstore": {
+      "command": "node",
+      "args": ["/path/to/memstore/backend/mcp-server.js"],
+      "env": {
+        "MEMSTORE_API_KEY": "am_live_..."
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `.cursor/mcp.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "memstore": {
+      "command": "node",
+      "args": ["backend/mcp-server.js"],
+      "env": {
+        "MEMSTORE_API_KEY": "am_live_..."
+      }
+    }
+  }
+}
+```
+
+### Tools exposed
+
+| Tool | Description |
+|------|-------------|
+| `remember(content, session?)` | Store a memory |
+| `recall(query, session?, top_k?)` | Semantic search |
+| `forget(memory_id)` | Delete a memory by ID |
+
+---
+
 ## Stack
 
 - **Node.js + Express** — API server
@@ -59,3 +141,4 @@ curl "https://memstore.dev/v1/memory/recall?q=what+language+does+the+user+prefer
 - **OpenAI** — `text-embedding-3-small` for embeddings
 - **Railway** — deployment
 - **Stripe** — usage-based billing
+- **Resend** — transactional email

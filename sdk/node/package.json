@@ -1,0 +1,26 @@
+{
+  "name": "memstore",
+  "version": "1.0.0",
+  "description": "Persistent memory API for AI agents — Node.js SDK",
+  "main": "src/index.js",
+  "exports": {
+    ".": {
+      "require": "./src/index.js",
+      "import": "./src/index.js"
+    }
+  },
+  "scripts": {
+    "test": "node examples/basic.js"
+  },
+  "keywords": ["memstore", "ai", "memory", "agents", "llm", "vector", "rag"],
+  "author": "Memstore",
+  "license": "MIT",
+  "homepage": "https://memstore.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gambino9823/memstore"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
