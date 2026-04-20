@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>Memstore vs Pinecone for AI Agent Memory</title>
+<meta name="description" content="Memstore vs Pinecone for AI agents. Pinecone is a vector database. Memstore is a memory API. Here is the difference and when to use each.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090F;
+  --bg2:#0F0F1A;
+  --bg3:#13131F;
+  --surface:#161624;
+  --border:rgba(255,255,255,0.07);
+  --border-bright:rgba(255,255,255,0.14);
+  --text:#F0EFE8;
+  --muted:#8886A0;
+  --dim:#4A4860;
+  --brand:#7B6EF6;
+  --brand-dim:#3D3680;
+  --brand-glow:rgba(123,110,246,0.15);
+  --teal:#2DD4BF;
+  --amber:#F59E0B;
+  --green:#34D399;
+  --red:#F87171;
+  --radius:12px;
+  --font-display:'Instrument Serif',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'Geist Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(16px);background:rgba(9,9,15,0.8)}
+.nav-logo{font-family:var(--font-mono);font-size:15px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
+.nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
+.article-hero{padding:120px 40px 64px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(123,110,246,0.10) 0%,transparent 70%);pointer-events:none}
+.article-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--brand-glow);border:1px solid rgba(123,110,246,0.3);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--brand);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:24px}
+.article-hero h1{font-family:var(--font-display);font-size:clamp(36px,5vw,60px);font-weight:400;line-height:1.1;letter-spacing:-0.02em;max-width:820px;margin:0 auto 24px}
+.article-hero h1 em{font-style:italic;color:var(--brand)}
+.article-meta{font-size:14px;color:var(--dim);display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.article-wrap{max-width:740px;margin:0 auto;padding:0 40px 100px}
+.article-wrap h2{font-family:var(--font-display);font-size:clamp(26px,3.5vw,36px);font-weight:400;line-height:1.15;letter-spacing:-0.01em;margin:56px 0 16px;color:var(--text)}
+.article-wrap h3{font-size:20px;font-weight:600;margin:36px 0 12px;color:var(--text)}
+.article-wrap p{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:20px}
+.article-wrap p strong{color:var(--text);font-weight:600}
+.article-wrap ul,.article-wrap ol{margin:0 0 20px 0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.article-wrap ul li,.article-wrap ol li{font-size:16px;color:var(--muted);line-height:1.7;padding-left:24px;position:relative}
+.article-wrap ul li::before{content:'—';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono)}
+.article-wrap ol{counter-reset:ol-counter}
+.article-wrap ol li{counter-increment:ol-counter}
+.article-wrap ol li::before{content:counter(ol-counter)'.';position:absolute;left:0;color:var(--brand);font-family:var(--font-mono);font-size:13px}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:24px 0}
+.code-label{background:var(--bg3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.code-label-text{font-size:11px;font-family:var(--font-mono);color:var(--dim);letter-spacing:0.08em;text-transform:uppercase}
+.code-lang{font-size:11px;font-family:var(--font-mono);color:var(--brand);letter-spacing:0.06em}
+.code-block pre{padding:20px;font-family:var(--font-mono);font-size:13px;line-height:1.75;overflow-x:auto;color:var(--muted)}
+.code-block pre .kw{color:#C084FC}
+.code-block pre .str{color:#86EFAC}
+.code-block pre .key{color:#93C5FD}
+.code-block pre .cmt{color:var(--dim)}
+.code-block pre .fn{color:#67E8F9}
+.code-block pre .num{color:#FCD34D}
+.code-block pre .cls{color:var(--amber)}
+.callout{background:var(--brand-glow);border:1px solid rgba(123,110,246,0.25);border-radius:var(--radius);padding:20px 24px;margin:28px 0;font-size:15px;color:var(--text);line-height:1.65}
+.callout strong{color:var(--brand)}
+.article-wrap hr{border:none;border-top:1px solid var(--border);margin:48px 0}
+.compare-table{width:100%;border-collapse:collapse;margin:24px 0;font-size:14px}
+.compare-table th,.compare-table td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
+.compare-table th{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--dim);background:var(--bg3)}
+.compare-table td{color:var(--muted)}
+.compare-table td:first-child{color:var(--text);font-weight:500}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02)}
+.compare-table .yes{color:var(--green)}
+.compare-table .no{color:var(--dim)}
+.compare-table .brand{color:var(--brand)}
+.article-cta{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;margin:64px 0 0}
+.article-cta h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;margin-bottom:12px}
+.article-cta p{color:var(--muted);font-size:16px;margin-bottom:28px}
+.btn-primary{display:inline-block;background:var(--brand);color:#fff;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;transition:all .2s}
+.btn-primary:hover{background:#9080FF;transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,110,246,0.35)}
+.further-reading{margin-top:48px}
+.further-reading h3{font-size:16px;font-weight:600;margin-bottom:16px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-family:var(--font-mono)}
+.reading-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:8px}
+.reading-list li::before{display:none}
+.reading-list a{font-size:15px;color:var(--brand);text-decoration:none}
+.reading-list a:hover{text-decoration:underline}
+footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;max-width:1100px;margin:0 auto}
+.footer-logo{font-family:var(--font-mono);font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--muted)}
+.footer-legal{font-size:12px;color:var(--dim)}
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .article-hero{padding:100px 20px 48px}
+  .article-wrap{padding:0 20px 64px}
+  .article-cta{padding:36px 24px}
+  footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
+  .compare-table{font-size:12px}
+  .compare-table th,.compare-table td{padding:8px 10px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <div class="nav-links">
+    <a href="https://memstore.dev/#how">How it works</a>
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+  </div>
+  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+</nav>
+
+<div class="article-hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1">
+    <div class="article-eyebrow">Compare</div>
+    <h1>Memstore vs <em>Pinecone</em><br>for AI Agent Memory</h1>
+    <div class="article-meta">
+      <span>Memory API vs Vector Database</span>
+      <span>·</span>
+      <span>When to use each</span>
+    </div>
+  </div>
+</div>
+
+<div class="article-wrap">
+
+  <div class="callout">
+    Pinecone is a vector database. Memstore is a memory API built specifically for AI agents. Pinecone stores and searches vectors — <strong>you manage the embedding pipeline yourself</strong>. Memstore handles embedding generation, storage, and semantic recall in a single API call.
+  </div>
+
+  <p>This is an important distinction. They are not direct competitors — they solve the problem at different levels of abstraction.</p>
+
+  <h2>Quick Comparison</h2>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Memstore</th>
+        <th>Pinecone</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>What it is</td><td>Memory API for agents</td><td>Vector database</td></tr>
+      <tr><td>Embedding generation</td><td class="yes">Automatic</td><td class="no">You manage it</td></tr>
+      <tr><td>Agent-native design</td><td class="yes">Yes</td><td class="no">No — general purpose</td></tr>
+      <tr><td>Free tier</td><td>1,000 ops/month</td><td>Free starter tier</td></tr>
+      <tr><td>Paid entry</td><td class="brand">$19/month</td><td>$70/month (Standard)</td></tr>
+      <tr><td>Setup</td><td>2 API calls</td><td>SDK + embedding pipeline + index management</td></tr>
+      <tr><td>Best for</td><td>Agent memory</td><td>General vector search at scale</td></tr>
+    </tbody>
+  </table>
+
+  <hr>
+
+  <h2>When to Use Memstore</h2>
+  <ul>
+    <li>You want agent memory working in under 5 minutes</li>
+    <li>You do not want to manage embedding models or indexes</li>
+    <li>You are building one or a few agents, not a vector search platform</li>
+    <li>Predictable per-op pricing matters to you</li>
+  </ul>
+
+  <h2>When to Use Pinecone</h2>
+  <ul>
+    <li>You need vector search at massive scale (billions of vectors)</li>
+    <li>You are building a product where vector search is the core feature</li>
+    <li>You need fine-grained control over embedding models and indexes</li>
+    <li>You have a team that can manage the infrastructure</li>
+  </ul>
+
+  <hr>
+
+  <h2>The Real Question</h2>
+  <p>If you are building an AI agent that needs memory, Memstore is almost always the faster and cheaper path. If you are building a search product that happens to use vectors, Pinecone is the right tool.</p>
+  <p>The overhead with Pinecone isn't the database — it's everything around it. <strong>Every store and every recall requires an embedding API call</strong>, error handling for that call, index management, and namespace logic. That is a non-trivial surface area to maintain.</p>
+
+  <hr>
+
+  <h2>Code Comparison</h2>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">Memstore — 2 calls, done</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">from</span> memstore <span class="kw">import</span> <span class="cls">Memstore</span>
+
+ms = <span class="cls">Memstore</span>(api_key=<span class="str">"am_live_..."</span>)
+
+ms.<span class="fn">remember</span>(<span class="str">"User prefers Python for backend work"</span>)
+memories = ms.<span class="fn">recall</span>(<span class="str">"programming preferences"</span>)</pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-label">
+      <span class="code-label-text">Pinecone — you manage the full pipeline</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">from</span> pinecone <span class="kw">import</span> <span class="cls">Pinecone</span>
+<span class="kw">from</span> openai <span class="kw">import</span> <span class="cls">OpenAI</span>
+
+openai = <span class="cls">OpenAI</span>()
+pc = <span class="cls">Pinecone</span>(api_key=<span class="str">"your-key"</span>)
+index = pc.<span class="fn">Index</span>(<span class="str">"agent-memory"</span>)
+
+<span class="cmt"># You generate the embedding yourself</span>
+embedding = openai.embeddings.<span class="fn">create</span>(
+    input=<span class="str">"User prefers Python for backend work"</span>,
+    model=<span class="str">"text-embedding-3-small"</span>
+).data[<span class="num">0</span>].embedding
+
+<span class="cmt"># Then upsert it</span>
+index.<span class="fn">upsert</span>(vectors=[{
+    <span class="str">"id"</span>: <span class="str">"mem_001"</span>,
+    <span class="str">"values"</span>: embedding,
+    <span class="str">"metadata"</span>: {<span class="str">"content"</span>: <span class="str">"User prefers Python..."</span>}
+}])
+
+<span class="cmt"># Query also requires embedding generation</span>
+query_embedding = openai.embeddings.<span class="fn">create</span>(
+    input=<span class="str">"programming preferences"</span>,
+    model=<span class="str">"text-embedding-3-small"</span>
+).data[<span class="num">0</span>].embedding
+
+results = index.<span class="fn">query</span>(
+    vector=query_embedding,
+    top_k=<span class="num">5</span>,
+    include_metadata=<span class="cls">True</span>
+)</pre>
+  </div>
+
+  <div class="article-cta">
+    <h2>Skip the pipeline</h2>
+    <p>Get started with Memstore free — no embedding pipeline, no index management.</p>
+    <a href="https://memstore.dev" class="btn-primary">Get your free API key &rarr;</a>
+  </div>
+
+  <hr>
+
+  <div class="further-reading">
+    <h3>More Comparisons</h3>
+    <ul class="reading-list">
+      <li><a href="/compare/memstore-vs-mem0.html">Memstore vs Mem0 — AI Agent Memory API Comparison</a></li>
+      <li><a href="/compare/memstore-vs-zep.html">Memstore vs Zep — Agent Memory Comparison 2026</a></li>
+      <li><a href="/compare/memstore-vs-chromadb.html">Memstore vs ChromaDB for AI Agent Memory</a></li>
+      <li><a href="/compare/memstore-vs-pgvector.html">Memstore vs Building Your Own pgvector Memory Layer</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo"><span class="logo-dot" style="width:8px;height:8px;border-radius:50%;background:var(--brand);display:inline-block"></span>memstore</div>
+  <div class="footer-links">
+    <a href="https://memstore.dev/#api">API</a>
+    <a href="https://memstore.dev/#pricing">Pricing</a>
+    <a href="/guide.html">Guides</a>
+    <a href="/blog/langchain-memory.html">Blog</a>
+  </div>
+  <div class="footer-legal">© 2026 Memstore</div>
+</footer>
+
+</body>
+</html>
