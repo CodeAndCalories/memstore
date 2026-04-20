@@ -233,6 +233,33 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 .nav-dropdown-menu a:hover{color:var(--text);background:var(--bg3)}
 .nav-dropdown-menu a::after{display:none}
 
+.aihub-showcase{padding:80px 0;border-top:1px solid rgba(255,255,255,0.06)}
+.showcase-inner{max-width:1000px;margin:0 auto;padding:0 24px}
+.showcase-label{font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:#7B6EF6;margin-bottom:32px;font-weight:500}
+.showcase-content{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.showcase-content h2{font-size:28px;font-weight:600;color:#F0EFE8;margin-bottom:16px;line-height:1.3}
+.showcase-content p{font-size:15px;color:#8886A0;line-height:1.7;margin-bottom:20px}
+.showcase-features{list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:8px}
+.showcase-features li{font-size:14px;color:#8886A0;padding-left:16px;position:relative}
+.showcase-features li::before{content:'→';position:absolute;left:0;color:#7B6EF6}
+.showcase-actions{display:flex;gap:12px;flex-wrap:wrap}
+.showcase-btn-primary{display:inline-block;background:#7B6EF6;color:#fff;text-decoration:none;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:500;transition:opacity 0.15s}
+.showcase-btn-primary:hover{opacity:0.88}
+.showcase-btn-secondary{display:inline-block;background:transparent;color:#F0EFE8;text-decoration:none;padding:10px 22px;border-radius:8px;font-size:14px;border:1px solid rgba(255,255,255,0.1);transition:border-color 0.15s}
+.showcase-btn-secondary:hover{border-color:rgba(255,255,255,0.25)}
+.showcase-visual{display:flex;justify-content:center}
+.showcase-mockup{background:#0D0D1A;border:1px solid rgba(123,110,246,0.2);border-radius:12px;padding:16px;width:100%;max-width:340px}
+.mockup-bar{display:flex;align-items:center;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.mockup-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mockup-label{font-size:11px;color:#4A4860;margin-left:4px;font-family:monospace}
+.mockup-panels{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mockup-panel{background:#161624;border:1px solid rgba(255,255,255,0.05);border-radius:6px;padding:8px}
+.mockup-panel-header{font-size:10px;font-weight:600;margin-bottom:5px}
+.mockup-msg{font-size:9px;color:#4A4860;line-height:1.5}
+.mockup-memory{display:flex;align-items:center;gap:6px;font-size:10px;color:#4A4860;padding-top:8px;border-top:1px solid rgba(255,255,255,0.04)}
+.mockup-mem-dot{width:6px;height:6px;border-radius:50%;background:#7B6EF6;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
 @media(max-width:768px){
   nav{padding:0 20px}
   .nav-links{display:none}
@@ -249,6 +276,8 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   .price-card.featured{transform:none}
   .try-grid,.problem-grid,.security-grid,.use-grid{grid-template-columns:1fr!important}
   .diy-grid{grid-template-columns:1fr!important}
+  .showcase-content{grid-template-columns:1fr;gap:32px}
+  .showcase-visual{display:none}
 }
 
 /* modal */
@@ -299,6 +328,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
       </div>
     </div>
     <a href="#" style="font-family:var(--font-mono);font-size:13px">Docs</a>
+    <a href="mailto:austin@memstore.dev" style="font-family:var(--font-mono);font-size:13px">Contact</a>
   </div>
   <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" class="nav-upgrade" target="_blank" rel="noopener">Upgrade plan</a>
   <a href="#" class="nav-cta" onclick="openModal();return false;">Get API key</a>
@@ -1111,6 +1141,54 @@ requests.post(
     </div>
   </div>
 </div>
+
+<!-- AI HUB SHOWCASE -->
+<section class="aihub-showcase">
+  <div class="showcase-inner">
+    <div class="showcase-label">Built with Memstore</div>
+    <div class="showcase-content">
+      <div class="showcase-text">
+        <h2>AI Hub — see Memstore in action</h2>
+        <p>AI Hub is a free multi-AI dashboard that uses Memstore to give every conversation persistent memory. Chat with ChatGPT, Claude, Gemini, Grok, and local Ollama models simultaneously — with memory that actually survives across sessions.</p>
+        <ul class="showcase-features">
+          <li>Broadcast one message to all AIs at once</li>
+          <li>Run structured debates between models</li>
+          <li>Persistent memory powered by Memstore</li>
+          <li>Free to use — bring your own API keys</li>
+        </ul>
+        <div class="showcase-actions">
+          <a href="https://aihubdash.com" target="_blank" class="showcase-btn-primary">Try AI Hub free →</a>
+          <a href="https://aihubdash.com/dashboard/" target="_blank" class="showcase-btn-secondary">Open dashboard</a>
+        </div>
+      </div>
+      <div class="showcase-visual">
+        <div class="showcase-mockup">
+          <div class="mockup-bar">
+            <span class="mockup-dot" style="background:#10a37f"></span>
+            <span class="mockup-dot" style="background:#cc785c"></span>
+            <span class="mockup-dot" style="background:#4285f4"></span>
+            <span class="mockup-dot" style="background:#1d9bf0"></span>
+            <span class="mockup-label">AI Hub</span>
+          </div>
+          <div class="mockup-panels">
+            <div class="mockup-panel">
+              <div class="mockup-panel-header" style="color:#10a37f">ChatGPT</div>
+              <div class="mockup-msg">The relay feature turns parallel threads into one collaborative conversation...</div>
+            </div>
+            <div class="mockup-panel">
+              <div class="mockup-panel-header" style="color:#cc785c">Claude</div>
+              <div class="mockup-msg">Debate mode is where it gets interesting — AIs react to each other's answers...</div>
+            </div>
+          </div>
+          <div class="mockup-memory">
+            <span class="mockup-mem-dot"></span>
+            Memory synced via Memstore
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <footer>
   <div class="footer-top">
