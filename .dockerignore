@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+.claude
+*.md
+public/screenshots/*.png
+public/screenshots/*.jpg
+sdk/python/dist
+sdk/python/build
+sdk/python/*.egg-info
+sdk/node/node_modules

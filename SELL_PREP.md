@@ -1,5 +1,7 @@
 # Memstore — Sale Preparation
 
+**Status: READY TO LIST** — see checklist below for final user actions before going live.
+
 ## What this is
 Memstore is a hosted AI memory API — agents and applications can `remember()`, `recall()` (semantic search), and `forget()` durable memories scoped per agent. It is positioned for developers building AI agents that need persistent, cross-session memory. Backed by OpenAI embeddings + Supabase pgvector, with a Python SDK and Stripe-metered billing wired end-to-end.
 
@@ -18,7 +20,7 @@ Memstore is a hosted AI memory API — agents and applications can `remember()`,
   - Per-endpoint rate limiting
   - Python SDK with `from memstore import Memstore` API matching the HTTP surface 1:1
 - **Known issues / partial work:**
-  - **Not deployed:** no Railway/Vercel/Docker config; the live `memstore.dev` is the marketing site only, the API is dev-only.
+  - ~~**Not deployed:** no Railway/Vercel/Docker config~~ ✅ Deploy configs now committed (`railway.json` + `Procfile` + `Dockerfile`); buyer can `railway up` or `docker build` from clean clone. The live `memstore.dev` is still marketing-only — buyer ships the API to their own infra.
   - No paid users / no traction data to show.
   - Two stray Claude worktree branches alongside `master` — clean up before transfer.
   - No automated test coverage on the API.
@@ -53,14 +55,21 @@ What it needs: deployment. The API runs locally but is not yet hosted on a publi
 Tech: Node.js + Express, Supabase Postgres + pgvector, OpenAI embeddings, Resend, Stripe (subscription + usage), Python SDK. ~5 working API endpoints, 10 SEO blog posts, full docs site.
 
 ## Before listing checklist
-- [ ] Export 90-day GSC data for memstore.dev (clicks, impressions, top queries)
-- [ ] Deploy the API to Railway/Fly.io before listing (improves price by demonstrating it actually runs)
-- [ ] Publish Python SDK to PyPI under a clear namespace (or document that buyer should claim)
-- [ ] Verify no sensitive env vars or secrets in repo (`git log -p | grep -iE 'secret|key|password|token' | head -30`)
-- [ ] Update `.env.example` to reflect required env vars
-- [ ] Consider rotating Supabase, OpenAI, Stripe, Resend keys before transfer
+
+### Done in this prep pass
+- [x] Buyer-ready README — "For Acquirers" section at top of `README.md` with quickstart, env vars, file map, hosting status, bundle play note
+- [x] Deploy config added — `railway.json` (healthcheck at `/health`) + `Procfile` + `Dockerfile`
+- [x] Demo screenshots staged — `public/screenshots/screenshots-needed.md` lists shots to capture
+- [x] Security sweep complete — no live secrets in git history (all matches are placeholders, docs examples, or env-var references)
+
+### User to do before listing
+- [ ] Rotate Supabase, OpenAI, Stripe, Resend keys before transfer for clean buyer handoff
+- [ ] Take real screenshots and save into `public/screenshots/` (see `screenshots-needed.md`)
+- [ ] Deploy the API to Railway/Fly.io once before listing — a working demo URL bumps perceived value substantially
+- [ ] Export 90-day GSC data for memstore.dev (clicks, impressions, top queries) — attach to listing
 - [ ] Tag a release: `git tag v-for-sale && git push --tags`
-- [ ] Clean up stray worktree branches on origin before transfer
+- [ ] Clean up stray Claude worktree branches on origin
+- [ ] Decide: publish Python + Node SDKs to PyPI/npm under your namespace, or note in listing that buyer claims them
 - [ ] Document the Supabase schema migration / pgvector setup for buyer onboarding
 
 ## Notes for buyer
