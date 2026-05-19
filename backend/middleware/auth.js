@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const supabase = require('../config/supabase');
 const { sendUsageAlert } = require('../services/email');
+const { checkAndIncrement } = require('../services/rateLimits');
 
 // Cache verified keys in memory to avoid DB hit on every request
 const keyCache = new Map(); // prefix -> { agentId, plan, ops_used, ops_limit, email, name }
@@ -22,6 +23,18 @@ function checkHourlyLimit(prefix, plan) {
   if (entry.count >= limit) return false;
   entry.count++;
   return true;
+}
+
+// Picks Supabase-backed counter when RATE_LIMITS_BACKEND=supabase, otherwise
+// falls back to the in-memory counter above. Owner flips the env var on
+// Railway after the migration runs.
+async function checkHourlyLimitGated(prefix, plan) {
+  if (process.env.RATE_LIMITS_BACKEND === 'supabase') {
+    const limit = HOURLY_LIMITS[plan] ?? HOURLY_LIMITS.free;
+    const { allowed } = await checkAndIncrement('hourly:' + prefix, 3600, limit);
+    return allowed;
+  }
+  return checkHourlyLimit(prefix, plan);
 }
 
 // Track which agents have already received an 80% alert this process lifetime.
@@ -70,7 +83,7 @@ async function auth(req, res, next) {
     }
 
     // Hourly request rate limit
-    if (!checkHourlyLimit(prefix, cached.plan)) {
+    if (!(await checkHourlyLimitGated(prefix, cached.plan))) {
       return res.status(429).json({
         error: 'hourly_rate_limit',
         message: 'Hourly rate limit reached. Upgrade your plan for higher limits.',
@@ -121,7 +134,7 @@ async function auth(req, res, next) {
   req.agent = { ...data, agentId: data.id };
 
   // Hourly request rate limit
-  if (!checkHourlyLimit(prefix, data.plan)) {
+  if (!(await checkHourlyLimitGated(prefix, data.plan))) {
     return res.status(429).json({
       error: 'hourly_rate_limit',
       message: 'Hourly rate limit reached. Upgrade your plan for higher limits.',
