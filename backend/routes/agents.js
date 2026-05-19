@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const { Resend } = require('resend');
 const supabase = require('../config/supabase');
+const { checkAndIncrement } = require('../services/rateLimits');
 
 // ── IP rate limiter: max 3 signups per IP per 24 hours ────────────────────────
 const ipSignupCounts = new Map(); // ip -> { count, windowStart }
@@ -20,6 +21,16 @@ function checkIpLimit(ip) {
   if (entry.count >= IP_MAX) return false;
   entry.count++;
   return true;
+}
+
+// Picks Supabase-backed counter when RATE_LIMITS_BACKEND=supabase, otherwise
+// falls back to the in-memory counter above.
+async function checkIpLimitGated(ip) {
+  if (process.env.RATE_LIMITS_BACKEND === 'supabase') {
+    const { allowed } = await checkAndIncrement('ip-signup:' + ip, 86400, IP_MAX);
+    return allowed;
+  }
+  return checkIpLimit(ip);
 }
 
 // ── Disposable email domain blocklist ─────────────────────────────────────────
@@ -56,7 +67,7 @@ router.post('/', async (req, res) => {
 
   // IP-based signup rate limit
   const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
-  if (!checkIpLimit(clientIp)) {
+  if (!(await checkIpLimitGated(clientIp))) {
     return res.status(429).json({
       error: 'ip_rate_limit',
       message: 'Too many accounts created from this IP. Try again tomorrow.',
