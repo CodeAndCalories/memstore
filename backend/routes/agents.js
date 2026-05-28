@@ -84,7 +84,7 @@ router.post('/', async (req, res) => {
     .insert({
       api_key: hashedKey,
       api_key_prefix: prefix,
-      name: name || 'My Agent',
+      name: (typeof name === 'string' ? name.trim().slice(0, 100) : null) || 'My Agent',
       owner_email: email,
       plan: 'free',
       ops_limit: 1000,
@@ -94,7 +94,7 @@ router.post('/', async (req, res) => {
 
   if (error) {
     console.error('create agent error:', error.message);
-    return res.status(500).json({ error: 'server_error', message: error.message });
+    return res.status(500).json({ error: 'server_error', message: 'An internal error occurred.' });
   }
 
   // Send welcome email — fire and forget, don't block the response

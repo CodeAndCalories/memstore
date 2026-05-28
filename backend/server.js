@@ -8,7 +8,11 @@ const app = express();
 // Trust the first proxy hop (Railway, etc.) so req.ip reflects the real client IP
 app.set('trust proxy', 1);
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://memstore.dev', 'https://www.memstore.dev'],
+  methods: ['GET', 'POST', 'DELETE'],
+  allowedHeaders: ['Authorization', 'Content-Type'],
+}));
 
 // Stripe webhook MUST come before express.json() — needs raw body
 app.use('/v1/webhook/stripe', require('./routes/webhook'));

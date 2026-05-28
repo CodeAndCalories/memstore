@@ -1,9 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const supabase = require('../config/supabase');
 
+const subscribeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'rate_limited', message: 'Too many subscribe attempts. Try again later.' },
+});
+
 // POST /v1/newsletter/subscribe
-router.post('/subscribe', async (req, res) => {
+router.post('/subscribe', subscribeLimiter, async (req, res) => {
   const { email } = req.body;
 
   if (!email || typeof email !== 'string') {
@@ -28,7 +37,7 @@ router.post('/subscribe', async (req, res) => {
       return res.status(200).json({ ok: true, message: 'Already subscribed.' });
     }
     console.error('newsletter subscribe error:', error.message);
-    return res.status(500).json({ error: 'server_error', message: error.message });
+    return res.status(500).json({ error: 'server_error', message: 'An internal error occurred.' });
   }
 
   res.status(201).json({ ok: true, message: 'Subscribed successfully.' });

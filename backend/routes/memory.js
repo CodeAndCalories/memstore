@@ -41,7 +41,7 @@ router.post('/remember', auth, async (req, res) => {
     });
   } catch (err) {
     console.error('remember error:', err.message);
-    res.status(500).json({ error: 'server_error', message: err.message });
+    res.status(500).json({ error: 'server_error', message: 'An internal error occurred.' });
   }
 });
 
@@ -61,8 +61,8 @@ router.get('/recall', auth, async (req, res) => {
       agentId: req.agent.agentId,
       query: q,
       session,
-      topK: parseInt(top_k) || 5,
-      threshold: parseFloat(threshold) || 0.5,
+      topK: Math.min(Math.max(parseInt(top_k) || 5, 1), 20),
+      threshold: Math.min(Math.max(parseFloat(threshold) || 0.5, 0), 1),
     });
 
     await memorySvc.logUsage({ agentId: req.agent.agentId, operation: 'recall' });
@@ -74,7 +74,7 @@ router.get('/recall', auth, async (req, res) => {
     });
   } catch (err) {
     console.error('recall error:', err.message);
-    res.status(500).json({ error: 'server_error', message: err.message });
+    res.status(500).json({ error: 'server_error', message: 'An internal error occurred.' });
   }
 });
 
@@ -91,7 +91,7 @@ router.delete('/forget/:id', auth, async (req, res) => {
     res.json({ deleted: true, id: req.params.id });
   } catch (err) {
     console.error('forget error:', err.message);
-    res.status(500).json({ error: 'server_error', message: err.message });
+    res.status(500).json({ error: 'server_error', message: 'An internal error occurred.' });
   }
 });
 
@@ -103,8 +103,8 @@ router.get('/list', auth, async (req, res) => {
     const result = await memorySvc.list({
       agentId: req.agent.agentId,
       session,
-      limit: Math.min(parseInt(limit) || 20, 100),
-      offset: parseInt(offset) || 0,
+      limit: Math.min(Math.max(parseInt(limit) || 20, 1), 100),
+      offset: Math.max(parseInt(offset) || 0, 0),
     });
 
     await memorySvc.logUsage({ agentId: req.agent.agentId, operation: 'list' });
@@ -112,7 +112,7 @@ router.get('/list', auth, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('list error:', err.message);
-    res.status(500).json({ error: 'server_error', message: err.message });
+    res.status(500).json({ error: 'server_error', message: 'An internal error occurred.' });
   }
 });
 

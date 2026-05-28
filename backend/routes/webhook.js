@@ -22,6 +22,14 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
     return res.status(400).json({ error: `Webhook error: ${err.message}` });
   }
 
+  // Idempotency guard — Stripe retries events; skip if already processed
+  const { data: existingEvent } = await supabase
+    .from('stripe_events')
+    .select('event_id')
+    .eq('event_id', event.id)
+    .maybeSingle();
+  if (existingEvent) return res.json({ received: true });
+
   try {
     switch (event.type) {
 
@@ -44,7 +52,6 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
             stripe_subscription_id: session.subscription,
           }).eq('id', agent.id);
           clearCache(agent.api_key_prefix);
-          console.log(`Upgraded ${email} to ${limits.plan}`);
 
           // Send upgrade confirmation email — fire and forget
           try {
@@ -150,7 +157,6 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
         if (agent) {
           await supabase.from('agents').update({ ops_used: 0 }).eq('id', agent.id);
           clearCache(agent.api_key_prefix);
-          console.log(`Reset monthly ops for ${invoice.customer}`);
         }
         break;
       }
@@ -167,18 +173,17 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
             plan: 'free', ops_limit: 1000, stripe_subscription_id: null,
           }).eq('id', agent.id);
           clearCache(agent.api_key_prefix);
-          console.log(`Downgraded ${sub.customer} to free`);
         }
         break;
       }
 
       case 'invoice.payment_failed':
-        console.warn(`Payment failed for ${event.data.object.customer} — send dunning email`);
         break;
 
       default:
         break;
     }
+    await supabase.from('stripe_events').insert({ event_id: event.id });
   } catch (err) {
     console.error('Webhook handler error:', err.message);
     return res.status(500).json({ error: 'handler_error' });

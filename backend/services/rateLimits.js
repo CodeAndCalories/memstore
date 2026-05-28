@@ -27,7 +27,6 @@ async function checkAndIncrement(key, windowSeconds, limit) {
     remaining: row?.remaining ?? 0,
   };
 
-  console.log(`[RATE_LIMIT] key=${key} count=${result.count} allowed=${result.allowed}`);
   return result;
 }
 
