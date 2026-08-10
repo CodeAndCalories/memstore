@@ -1,0 +1,3 @@
+# Treat images as binary: no line-ending conversion, no text diffs, no merges.
+*.png binary
+*.svg binary

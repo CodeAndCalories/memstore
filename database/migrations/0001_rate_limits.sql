@@ -1,6 +1,6 @@
 -- Persist rate-limit counters in Supabase so they survive Railway redeploys
 -- and are shared across instances. Prefix `memstore_` to avoid collision
--- with CallRelayHQ tables in the same Supabase project.
+-- with other applications sharing the same Supabase project.
 --
 -- Run this in the Supabase SQL editor.
 
