@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <title>CrewAI Agent Memory Between Runs — Memstore</title>
+<link rel="canonical" href="https://memstore.dev/docs/crewai-memory-between-runs.html">
 <meta name="description" content="CrewAI agents forget between runs by default. Add persistent memory with a simple REST API.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,19 +87,34 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
   .article-cta{padding:36px 24px}.concept-grid{grid-template-columns:1fr}
   footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
 }
+
+/* ── archived-project banner ─────────────────────────────────── */
+.archive-banner{position:fixed;top:0;left:0;right:0;z-index:101;height:34px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;line-height:1.45;color:var(--muted)}
+.archive-banner a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.archive-banner a:hover{color:var(--text)}
+body{padding-top:34px}
+nav{top:34px}
+@media(max-width:700px){
+  .archive-banner{height:52px}
+  body{padding-top:52px}
+  nav{top:52px}
+}
 </style>
 </head>
 <body>
 
+<div class="archive-banner">
+  <span>Archived project &mdash; the hosted API is no longer running. <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">Source code</a> and full docs remain available.</span>
+</div>
 <nav>
-  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <a href="../index.html" class="nav-logo"><img src="../logo.svg" alt="memstore" height="32"></a>
   <div class="nav-links">
-    <a href="https://memstore.dev/#how">How it works</a>
-    <a href="https://memstore.dev/#api">API</a>
-    <a href="https://memstore.dev/#pricing">Pricing</a>
-    <a href="/guide.html">Guides</a>
+    <a href="../#how">How it works</a>
+    <a href="../#api">API</a>
+    <a href="../#pricing">Pricing</a>
+    <a href="../guide.html">Guides</a>
   </div>
-  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+  <a href="https://github.com/CodeAndCalories/memstore" class="nav-cta" target="_blank" rel="noopener">View source on GitHub</a>
 </nav>
 
 <div class="article-hero">
@@ -148,7 +164,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;justify
   </div>
 
   <h2>Quick Test — curl First</h2>
-  <p>Get your free API key at <a href="https://memstore.dev" style="color:var(--brand)">memstore.dev</a> and verify the round-trip before integrating with CrewAI:</p>
+  <p>Get your free API key at <a href="../index.html" style="color:var(--brand)">memstore.dev</a> and verify the round-trip before integrating with CrewAI:</p>
 
   <div class="code-block">
     <div class="code-label"><span class="code-label-text">Store a crew output</span><span class="code-lang">curl</span></div>
@@ -260,9 +276,9 @@ strategy_result = run_strategy_crew(SESSION, <span class="str">"Build go-to-mark
   </ul>
 
   <div class="article-cta">
-    <h2>Give your CrewAI agents a memory</h2>
-    <p>Free tier — 1,000 ops/month. No credit card. Persistent memory in under 10 minutes.</p>
-    <a href="https://memstore.dev" class="btn-primary">Get your API key &rarr;</a>
+    <h2>This project is archived</h2>
+    <p>The hosted API is no longer running. The full source &mdash; REST API, SDKs, MCP server, and Postgres schema &mdash; remains available to read.</p>
+    <a href="https://github.com/CodeAndCalories/memstore" class="btn-primary" target="_blank" rel="noopener">View source on GitHub &rarr;</a>
   </div>
 
   <hr>
@@ -270,23 +286,23 @@ strategy_result = run_strategy_crew(SESSION, <span class="str">"Build go-to-mark
   <div class="further-reading">
     <h3>Further Reading</h3>
     <ul class="reading-list">
-      <li><a href="/docs/persistent-memory-ai-agents.html">Persistent Memory for AI Agents: Full Guide</a></li>
-      <li><a href="/docs/langchain-memory-api.html">LangChain Persistent Memory API</a></li>
-      <li><a href="/quickstart.html">Quickstart — First memory in 5 minutes</a></li>
-      <li><a href="/guide.html">Full Memstore Guide</a></li>
+      <li><a href="../docs/persistent-memory-ai-agents.html">Persistent Memory for AI Agents: Full Guide</a></li>
+      <li><a href="../docs/langchain-memory-api.html">LangChain Persistent Memory API</a></li>
+      <li><a href="../quickstart.html">Quickstart — First memory in 5 minutes</a></li>
+      <li><a href="../guide.html">Full Memstore Guide</a></li>
     </ul>
   </div>
 
 </div>
 
 <footer>
-  <div class="footer-logo"><img src="/logo.svg" alt="memstore" height="28"></div>
+  <div class="footer-logo"><img src="../logo.svg" alt="memstore" height="28"></div>
   <div class="footer-links">
-    <a href="https://memstore.dev">Home</a>
-    <a href="https://memstore.dev/#api">API</a>
-    <a href="https://memstore.dev/#pricing">Pricing</a>
-    <a href="/guide.html">Guide</a>
-    <a href="/docs/persistent-memory-ai-agents.html">Docs</a>
+    <a href="../index.html">Home</a>
+    <a href="../#api">API</a>
+    <a href="../#pricing">Pricing</a>
+    <a href="../guide.html">Guide</a>
+    <a href="../docs/persistent-memory-ai-agents.html">Docs</a>
   </div>
   <div class="footer-legal">&copy; 2026 Memstore</div>
 </footer>

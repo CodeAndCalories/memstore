@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>Quickstart — Memstore</title>
+<link rel="canonical" href="https://memstore.dev/quickstart.html">
 <meta name="description" content="Get started with Memstore in minutes. Store your first memory, recall it semantically, and wire it into your agent with curl, Python, or Node.js.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -112,19 +113,34 @@ footer{padding:40px;border-top:1px solid var(--border);display:flex;justify-cont
   .page-footer-nav{flex-direction:column;align-items:flex-start}
   footer{padding:32px 20px;flex-direction:column;align-items:flex-start}
 }
+
+/* ── archived-project banner ─────────────────────────────────── */
+.archive-banner{position:fixed;top:0;left:0;right:0;z-index:101;height:34px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;line-height:1.45;color:var(--muted)}
+.archive-banner a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.archive-banner a:hover{color:var(--text)}
+body{padding-top:34px}
+nav{top:34px}
+@media(max-width:700px){
+  .archive-banner{height:52px}
+  body{padding-top:52px}
+  nav{top:52px}
+}
 </style>
 </head>
 <body>
 
+<div class="archive-banner">
+  <span>Archived project &mdash; the hosted API is no longer running. <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">Source code</a> and full docs remain available.</span>
+</div>
 <nav>
-  <a href="https://memstore.dev" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <a href="index.html" class="nav-logo"><img src="logo.svg" alt="memstore" height="32"></a>
   <div class="nav-links">
-    <a href="https://memstore.dev/#how">How it works</a>
-    <a href="https://memstore.dev/#api">API</a>
-    <a href="https://memstore.dev/#pricing">Pricing</a>
-    <a href="/guide.html">Guides</a>
+    <a href="#how">How it works</a>
+    <a href="#api">API</a>
+    <a href="#pricing">Pricing</a>
+    <a href="guide.html">Guides</a>
   </div>
-  <a href="https://memstore.dev" class="nav-cta">Get API key</a>
+  <a href="https://github.com/CodeAndCalories/memstore" class="nav-cta" target="_blank" rel="noopener">View source on GitHub</a>
 </nav>
 
 <div class="page-hero">
@@ -360,7 +376,7 @@ headers = {<span class="str">"Authorization"</span>: <span class="fn">f</span><s
   <!-- footer nav -->
   <div class="page-footer-nav">
     <p><strong>That's it.</strong> Your agent now has persistent memory across every run.</p>
-    <a href="/guide.html" class="btn-outline">View full guide &rarr;</a>
+    <a href="guide.html" class="btn-outline">View full guide &rarr;</a>
   </div>
 
 </div>
@@ -368,10 +384,10 @@ headers = {<span class="str">"Authorization"</span>: <span class="fn">f</span><s
 <footer>
   <div class="footer-logo"><span class="logo-dot"></span>memstore</div>
   <div class="footer-links">
-    <a href="https://memstore.dev/#api">API</a>
-    <a href="https://memstore.dev/#pricing">Pricing</a>
-    <a href="/guide.html">Guides</a>
-    <a href="/blog/langchain-memory.html">Blog</a>
+    <a href="#api">API</a>
+    <a href="#pricing">Pricing</a>
+    <a href="guide.html">Guides</a>
+    <a href="blog/langchain-memory.html">Blog</a>
   </div>
   <div class="footer-legal">© 2025 Memstore</div>
 </footer>

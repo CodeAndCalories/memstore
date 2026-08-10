@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>Memstore Admin</title>
+<link rel="canonical" href="https://memstore.dev/admin.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -109,14 +110,29 @@ tbody tr:hover td{background:rgba(255,255,255,0.02)}
   .stats-row{grid-template-columns:1fr 1fr}
   th:nth-child(5),td:nth-child(5){display:none}
 }
+
+/* ── archived-project banner ─────────────────────────────────── */
+.archive-banner{position:fixed;top:0;left:0;right:0;z-index:101;height:34px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;line-height:1.45;color:var(--muted)}
+.archive-banner a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.archive-banner a:hover{color:var(--text)}
+body{padding-top:34px}
+nav{top:34px}
+@media(max-width:700px){
+  .archive-banner{height:52px}
+  body{padding-top:52px}
+  nav{top:52px}
+}
 </style>
 </head>
 <body>
+<div class="archive-banner">
+  <span>Archived project &mdash; the hosted API is no longer running. <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">Source code</a> and full docs remain available.</span>
+</div>
 
 <!-- LOCK SCREEN -->
 <div id="lock-screen">
   <div class="lock-card">
-    <div class="lock-logo"><img src="/logo.svg" alt="memstore" height="32"></div>
+    <div class="lock-logo"><img src="logo.svg" alt="memstore" height="32"></div>
     <h2>Admin Dashboard</h2>
     <p>Enter the admin password to continue.</p>
     <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
@@ -130,7 +146,7 @@ tbody tr:hover td{background:rgba(255,255,255,0.02)}
 
   <header>
     <div class="header-logo">
-      <img src="/logo.svg" alt="memstore" height="28">
+      <img src="logo.svg" alt="memstore" height="28">
       <span class="header-badge">Admin</span>
     </div>
     <div class="header-right">

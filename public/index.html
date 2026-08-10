@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="description" content="Persistent memory API for AI agents. Store and recall context across runs with two REST calls. Works with LangChain, CrewAI, AutoGen. Encrypted at rest. Free tier available.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="description" content="Archived project. Memstore was a persistent memory API for AI agents — store and recall context across runs with two REST calls, backed by Postgres and pgvector. Source code and full docs remain available.">
 <title>Memstore — Persistent Memory API for AI Agents</title>
+<link rel="canonical" href="https://memstore.dev/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -42,8 +43,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;d
 .nav-links{display:flex;align-items:center;gap:32px}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s}
 .nav-links a:hover{color:var(--text)}
-.nav-upgrade{color:var(--brand);font-size:14px;font-weight:500;text-decoration:none;border:1px solid var(--brand);padding:7px 16px;border-radius:8px;transition:all .2s}
-.nav-upgrade:hover{background:rgba(123,110,246,0.1);transform:translateY(-1px)}
 .nav-cta{background:var(--brand);color:#fff;padding:8px 20px;border-radius:8px;font-size:14px;font-weight:500;text-decoration:none;transition:all .2s}
 .nav-cta:hover{background:#9080FF;transform:translateY(-1px)}
 
@@ -165,6 +164,8 @@ h2{font-family:var(--font-display);font-size:clamp(36px,5vw,56px);font-weight:40
 .plan-cta:hover{border-color:var(--brand);color:var(--brand)}
 .plan-cta.featured-cta{background:var(--brand);border-color:var(--brand);color:#fff}
 .plan-cta.featured-cta:hover{background:#9080FF}
+/* archived: plan tiers are display-only, no longer purchasable */
+.plan-static{width:100%;padding:12px 0;text-align:center;font-size:13px;color:var(--dim);font-family:var(--font-mono);letter-spacing:0.04em;border-top:1px solid var(--border)}
 
 /* faq */
 .faq-list{margin-top:64px;display:flex;flex-direction:column;gap:2px;border:1px solid var(--border);border-radius:16px;overflow:hidden}
@@ -192,19 +193,6 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 .footer-links a:hover{color:var(--muted)}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-top:24px;border-top:1px solid var(--border)}
 .footer-legal{font-size:12px;color:var(--dim)}
-/* newsletter */
-.footer-newsletter{}
-.footer-newsletter p{font-size:13px;color:var(--muted);margin-bottom:10px}
-.newsletter-form{display:flex;gap:8px}
-.newsletter-input{flex:1;min-width:0;padding:9px 14px;background:var(--bg2);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-size:14px;font-family:var(--font-body);outline:none;transition:border-color .2s}
-.newsletter-input::placeholder{color:var(--dim)}
-.newsletter-input:focus{border-color:var(--brand)}
-.newsletter-btn{flex-shrink:0;padding:9px 18px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:background .2s;white-space:nowrap}
-.newsletter-btn:hover{background:#9080FF}
-.newsletter-btn:disabled{opacity:0.55;cursor:not-allowed}
-.newsletter-msg{font-size:12px;margin-top:8px;min-height:16px}
-.newsletter-msg.ok{color:var(--green)}
-.newsletter-msg.err{color:var(--red)}
 
 /* comparison table */
 .cmp-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:48px}
@@ -271,8 +259,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   footer{padding:32px 20px}
   .footer-top{flex-direction:column}
   .footer-bottom{flex-direction:column;align-items:flex-start}
-  .newsletter-form{max-width:100%}
-  .step-connector{display:none}
+    .step-connector{display:none}
   .price-card.featured{transform:none}
   .try-grid,.problem-grid,.security-grid,.use-grid{grid-template-columns:1fr!important}
   .diy-grid{grid-template-columns:1fr!important}
@@ -280,58 +267,65 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   .showcase-visual{display:none}
 }
 
-/* modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--surface);border:1px solid var(--border-bright);border-radius:16px;padding:40px;width:100%;max-width:440px;position:relative;transform:translateY(16px);transition:transform .25s}
-.modal-overlay.open .modal{transform:translateY(0)}
-.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;transition:color .15s}
-.modal-close:hover{color:var(--text)}
-.modal h3{font-size:22px;font-weight:600;margin-bottom:8px}
-.modal>div>p,.modal-sub{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6}
-.modal label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px}
-.modal input[type=email]{width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--border-bright);border-radius:8px;color:var(--text);font-size:15px;font-family:var(--font-body);outline:none;transition:border-color .2s;margin-bottom:16px}
-.modal input[type=email]:focus{border-color:var(--brand)}
-.modal-submit{width:100%;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:all .2s}
-.modal-submit:hover{background:#9080FF}
-.modal-submit:disabled{opacity:0.55;cursor:not-allowed}
-.modal-error{color:var(--red);font-size:13px;margin-top:-8px;margin-bottom:12px;display:none}
-.key-result{margin-top:4px}
-.key-warning{display:flex;align-items:center;gap:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--amber);margin-bottom:16px}
-.key-box{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px}
-.key-text{font-family:var(--font-mono);font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.key-copy{flex-shrink:0;background:var(--brand);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:background .2s;font-family:var(--font-body)}
-.key-copy:hover{background:#9080FF}
-.key-hint{font-size:12px;color:var(--dim)}
+/* ── architecture / how it was built ─────────────────────────── */
+.cls{color:#F59E0B}
+.arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:40px}
+.arch-item{background:var(--surface);padding:22px 24px}
+.arch-k{font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+.arch-v{font-size:14.5px;color:var(--muted);line-height:1.6}
+.arch-v code{font-family:var(--font-mono);font-size:13px;color:var(--text);background:var(--bg3);padding:1px 5px;border-radius:4px}
+.arch-sub{font-size:20px;font-weight:600;color:var(--text);margin:56px 0 12px}
+.arch-note{font-size:14.5px;color:var(--muted);line-height:1.7;max-width:760px;margin-bottom:20px}
+.arch-note code{font-family:var(--font-mono);font-size:13px;color:var(--text);background:var(--bg3);padding:1px 5px;border-radius:4px}
+.arch-code{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.arch-code-bar{background:var(--bg3);padding:11px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:0.06em;color:var(--dim)}
+.arch-code pre{padding:24px;color:var(--muted)}
+@media(max-width:768px){
+  .arch-code pre{font-size:11.5px;padding:16px}
+}
+
+/* ── archived-project banner ─────────────────────────────────── */
+.archive-banner{position:fixed;top:0;left:0;right:0;z-index:101;height:34px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;line-height:1.45;color:var(--muted)}
+.archive-banner a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.archive-banner a:hover{color:var(--text)}
+body{padding-top:34px}
+nav{top:34px}
+@media(max-width:700px){
+  .archive-banner{height:52px}
+  body{padding-top:52px}
+  nav{top:52px}
+}
 </style>
 </head>
 <body>
 
+<div class="archive-banner">
+  <span>Archived project &mdash; the hosted API is no longer running. <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">Source code</a> and full docs remain available.</span>
+</div>
 <nav>
-  <a href="#" class="nav-logo"><img src="/logo.svg" alt="memstore" height="32"></a>
+  <a href="#" class="nav-logo"><img src="logo.svg" alt="memstore" height="32"></a>
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#api">API</a>
     <a href="#pricing">Pricing</a>
     <div class="nav-dropdown">
-      <a href="/guide.html">Guides</a>
+      <a href="guide.html">Guides</a>
       <div class="nav-dropdown-menu">
-        <a href="/quickstart.html">Quickstart</a>
-        <a href="/guide.html">Full guide</a>
-        <a href="/blog/langchain-memory.html">LangChain memory</a>
-        <a href="/blog/crewai-agent-memory.html">CrewAI memory</a>
-        <a href="/blog/autogen-agent-memory-tutorial.html">AutoGen memory</a>
-        <a href="/blog/openai-function-calling-memory.html">OpenAI function calling</a>
-        <a href="/blog/build-ai-assistant-with-memory.html">Build an AI assistant</a>
-        <a href="/blog/ai-agent-memory-between-sessions.html">Memory between sessions</a>
-        <a href="/blog/vector-database-ai-agents.html">Vector databases explained</a>
+        <a href="quickstart.html">Quickstart</a>
+        <a href="guide.html">Full guide</a>
+        <a href="blog/langchain-memory.html">LangChain memory</a>
+        <a href="blog/crewai-agent-memory.html">CrewAI memory</a>
+        <a href="blog/autogen-agent-memory-tutorial.html">AutoGen memory</a>
+        <a href="blog/openai-function-calling-memory.html">OpenAI function calling</a>
+        <a href="blog/build-ai-assistant-with-memory.html">Build an AI assistant</a>
+        <a href="blog/ai-agent-memory-between-sessions.html">Memory between sessions</a>
+        <a href="blog/vector-database-ai-agents.html">Vector databases explained</a>
       </div>
     </div>
     <a href="#" style="font-family:var(--font-mono);font-size:13px">Docs</a>
     <a href="mailto:austin@memstore.dev" style="font-family:var(--font-mono);font-size:13px">Contact</a>
   </div>
-  <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" class="nav-upgrade" target="_blank" rel="noopener">Upgrade plan</a>
-  <a href="#" class="nav-cta" onclick="openModal();return false;">Get API key</a>
+  <a href="https://github.com/CodeAndCalories/memstore" class="nav-cta" target="_blank" rel="noopener">View source on GitHub</a>
 </nav>
 
 <!-- HERO -->
@@ -347,14 +341,13 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
       <p style="font-size:17px;color:var(--muted);max-width:540px;margin:0 auto 16px;line-height:1.5">Persistent memory API for AI agents. Store and recall across runs.</p>
       <p class="hero-sub">One POST to remember. One GET to recall. Persistent semantic memory for every agent — no vector DB setup required.</p>
       <div class="hero-actions">
-        <a href="#" class="btn-primary" onclick="openModal();return false;">Get API Key &rarr;</a>
+        <a href="https://github.com/CodeAndCalories/memstore" class="btn-primary" target="_blank" rel="noopener">View source on GitHub &rarr;</a>
         <a href="#api" class="btn-ghost">View the API</a>
       </div>
       <div class="trust-row">
-        <div class="trust-item"><span>50–200 calls/run</span> avg agent usage</div>
-        <div class="trust-item"><span>&lt;50ms</span> recall latency</div>
-        <div class="trust-item"><span>Works with</span> any framework</div>
         <div class="trust-item"><span>pgvector</span> semantic search</div>
+        <div class="trust-item"><span>&lt;50ms</span> recall latency</div>
+        <div class="trust-item"><span>Framework</span> agnostic</div>
       </div>
     </div>
 
@@ -411,9 +404,8 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
   <div class="container">
     <div class="section-label">Try it now</div>
     <h2>Two calls.<br>That's the whole API.</h2>
-    <p class="section-sub">Copy your key and run these in your terminal.</p>
-    <p style="font-size:13px;font-weight:600;color:var(--brand);text-transform:uppercase;letter-spacing:0.1em;margin-top:32px;margin-bottom:16px">Try it in 60 seconds</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="try-grid">
+    <p class="section-sub">The entire surface area, as it was documented when the service ran.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px" class="try-grid">
       <div data-cw style="background:var(--surface);border:1px solid rgba(123,110,246,0.4);border-radius:var(--radius);overflow:hidden">
         <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px">
           <span style="font-size:12px;font-weight:500;color:var(--muted);font-family:var(--font-mono)">Store a memory</span>
@@ -442,7 +434,6 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 <span style="color:#4A4860">#   uses React","score":0.97,"age":"2h ago"}]}</span></pre>
       </div>
     </div>
-    <p style="margin-top:32px;text-align:center;font-size:14px;color:var(--dim)">Ready for production? <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;font-weight:500">Upgrade to Starter &rarr;</a></p>
   </div>
 </section>
 
@@ -533,6 +524,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
 .ds-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.2);border-radius:99px;padding:4px 12px;font-size:11px;color:#2DD4BF;font-weight:500;margin-bottom:12px}
 .ds-pulse{width:6px;height:6px;border-radius:50%;background:#2DD4BF;animation:dsPulse 1.5s infinite}
 @keyframes dsPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
 </style>
 <div class="ds">
 <div class="ds-shell">
@@ -604,7 +596,7 @@ footer{padding:48px 40px;border-top:1px solid var(--border);max-width:1100px;mar
       </div>
       <div class="ds-badge"><div class="ds-pulse"></div>Agent now has persistent memory across every run</div>
       <p style="font-size:13px;color:#6B6A7A;line-height:1.7;margin-bottom:16px">Every run starts with full context. No re-explaining. No hallucinating past decisions.</p>
-      <button class="ds-run" onclick="window.open('https://memstore.dev','_self')">Get your free API key →</button>
+      <button class="ds-run" onclick="window.open('https://github.com/CodeAndCalories/memstore','_blank')">View source on GitHub →</button>
     </div>
   </div>
 </div>
@@ -680,6 +672,97 @@ function dsStep(n){
   </div>
 </section>
 <!-- END DEMO SECTION -->
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="container">
+    <div class="section-label">Engineering</div>
+    <h2>How it was built</h2>
+    <p class="section-sub">A small, deliberately boring stack. Two endpoints doing real work, and one SQL function doing the interesting part.</p>
+
+    <div class="arch-grid">
+      <div class="arch-item">
+        <div class="arch-k">API</div>
+        <div class="arch-v">Node.js + Express REST API deployed on Railway</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Datastore</div>
+        <div class="arch-v">Supabase Postgres with the <code>pgvector</code> extension for semantic search</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Embeddings</div>
+        <div class="arch-v">OpenAI <code>text-embedding-3-small</code> &mdash; 1536 dimensions</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Recall</div>
+        <div class="arch-v">Cosine similarity through a Postgres RPC function, filtered by agent, session, and TTL</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Billing</div>
+        <div class="arch-v">Stripe subscriptions with webhook idempotency backed by a processed-event table</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Auth</div>
+        <div class="arch-v">Bcrypt-hashed API keys with prefix-based lookup caching</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Rate limiting</div>
+        <div class="arch-v">Per-plan hourly limits persisted in Postgres, so counters survive restarts and scale past one instance</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">Integrations</div>
+        <div class="arch-v">MCP server for native use inside Claude Desktop and Cursor</div>
+      </div>
+      <div class="arch-item">
+        <div class="arch-k">SDKs</div>
+        <div class="arch-v">First-party Python and Node clients wrapping the REST API</div>
+      </div>
+    </div>
+
+    <h3 class="arch-sub">The recall function</h3>
+    <p class="arch-note">Recall is one round trip. The API embeds the query, then hands the vector to Postgres, which does filtering, scoring, and ranking in a single indexed pass &mdash; no candidate set is ever shipped back to Node for re-ranking.</p>
+    <div class="arch-code" data-cw>
+      <div class="arch-code-bar">
+        <span>database/functions.sql</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="cmt">-- Semantic recall (cosine similarity via pgvector)</span>
+<span class="kw">CREATE OR REPLACE FUNCTION</span> <span class="fn">recall_memories</span>(
+  p_agent_id   <span class="cls">UUID</span>,
+  p_embedding  <span class="cls">VECTOR</span>(<span class="num">1536</span>),
+  p_session    <span class="cls">TEXT</span>  <span class="kw">DEFAULT NULL</span>,
+  p_top_k      <span class="cls">INT</span>   <span class="kw">DEFAULT</span> <span class="num">5</span>,
+  p_threshold  <span class="cls">FLOAT</span> <span class="kw">DEFAULT</span> <span class="num">0.5</span>
+)
+<span class="kw">RETURNS TABLE</span> (
+  id          <span class="cls">UUID</span>,
+  content     <span class="cls">TEXT</span>,
+  session     <span class="cls">TEXT</span>,
+  metadata    <span class="cls">JSONB</span>,
+  score       <span class="cls">FLOAT</span>,
+  created_at  <span class="cls">TIMESTAMPTZ</span>
+)
+<span class="kw">LANGUAGE SQL AS</span> $$
+  <span class="kw">SELECT</span>
+    m.id,
+    m.content,
+    m.session,
+    m.metadata,
+    <span class="num">1</span> - (m.embedding <span class="key">&lt;=&gt;</span> p_embedding) <span class="kw">AS</span> score,
+    m.created_at
+  <span class="kw">FROM</span> memories m
+  <span class="kw">WHERE</span>
+    m.agent_id = p_agent_id
+    <span class="kw">AND</span> (p_session <span class="kw">IS NULL OR</span> m.session = p_session)
+    <span class="kw">AND</span> (m.ttl <span class="kw">IS NULL OR</span> m.ttl &gt; <span class="fn">NOW</span>())
+    <span class="kw">AND</span> <span class="num">1</span> - (m.embedding <span class="key">&lt;=&gt;</span> p_embedding) &gt;= p_threshold
+  <span class="kw">ORDER BY</span> m.embedding <span class="key">&lt;=&gt;</span> p_embedding
+  <span class="kw">LIMIT</span> p_top_k;
+$$;</pre>
+    </div>
+    <p class="arch-note"><code>&lt;=&gt;</code> is pgvector's cosine distance operator, so <code>1 - distance</code> gives a similarity score in the same expression that drives the sort. The <code>ORDER BY</code> on the raw distance is what lets the ivfflat index serve the query; ordering on the derived <code>score</code> column instead would force a sequential scan.</p>
+  </div>
+</section>
 
 <!-- DEFINITION -->
 <section style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
@@ -786,14 +869,6 @@ function dsStep(n){
         <p style="font-size:14px;color:var(--muted);line-height:1.7">Share state across agent handoffs. One agent stores a decision; another recalls it 10 steps later — no message-passing spaghetti.</p>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- MID-PAGE CTA -->
-<section style="padding:56px 40px;text-align:center;background:var(--bg)">
-  <div class="container">
-    <a href="#" class="btn-primary" style="font-size:15px;padding:14px 40px" onclick="openModal();return false;">Get API Key &rarr;</a>
-    <p style="margin-top:14px;font-size:13px;color:var(--dim)">Free tier · No credit card · First key in 30 seconds</p>
   </div>
 </section>
 
@@ -984,6 +1059,7 @@ requests.post(
   <div class="container" style="text-align:center">
     <div class="section-label">Pricing</div>
     <h2>Usage-based pricing. No seats. No surprises.</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:-8px;margin-bottom:16px;font-style:italic">Pricing as designed when the service was live.</p>
     <p class="section-sub" style="margin:0 auto">Pay for what your agents use. Free tier generous enough to build your first production agent.</p>
     <p style="font-size:13px;color:var(--dim);margin-top:12px">1 operation = 1 store or recall call. Most agent runs use 20–100 ops.</p>
     <div class="pricing-grid">
@@ -998,8 +1074,7 @@ requests.post(
           <li>Semantic recall</li>
           <li>Session isolation</li>
         </ul>
-        <a href="#" class="plan-cta" onclick="openModal();return false;">Get started free</a>
-        <p style="margin-top:12px;font-size:12px;color:var(--dim);text-align:center">Need more? <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" target="_blank" rel="noopener" style="color:var(--brand);text-decoration:none;font-weight:500">Upgrade to Starter &rarr;</a></p>
+        <div class="plan-static">Free tier</div>
       </div>
       <div class="price-card featured">
         <div class="featured-badge">Most Popular</div>
@@ -1013,8 +1088,7 @@ requests.post(
           <li>Webhooks on update</li>
           <li>LLM-parseable errors</li>
         </ul>
-        <a href="https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00" class="plan-cta featured-cta" target="_blank" rel="noopener" onclick="window.open('https://buy.stripe.com/4gMcN70ie8Ti3db0kP9MY00','_blank');return false;">Start building &rarr;</a>
-        <p style="margin-top:10px;font-size:11px;color:var(--dim);text-align:center">Use the same email as your API key signup</p>
+        <div class="plan-static">$19 / month</div>
       </div>
       <div class="price-card">
         <div class="plan-name">Pro</div>
@@ -1028,8 +1102,7 @@ requests.post(
           <li>Custom TTL policies</li>
           <li>Usage analytics</li>
         </ul>
-        <a href="https://buy.stripe.com/8x2eVf2qm9Xm5lj9Vp9MY01" class="plan-cta" target="_blank" rel="noopener" onclick="window.open('https://buy.stripe.com/8x2eVf2qm9Xm5lj9Vp9MY01','_blank');return false;">Upgrade to Pro</a>
-        <p style="margin-top:10px;font-size:11px;color:var(--dim);text-align:center">Use the same email as your API key signup</p>
+        <div class="plan-static">$49 / month</div>
       </div>
     </div>
   </div>
@@ -1103,44 +1176,17 @@ requests.post(
 <!-- FINAL CTA -->
 <section class="cta-section">
   <div class="container">
-    <div class="section-label">Get started</div>
-    <h2>Give your agents<br>a memory worth keeping</h2>
-    <p>Free tier. No credit card. First API key in 30 seconds.</p>
-    <a href="#" class="btn-primary" style="font-size:16px;padding:16px 40px" onclick="openModal();return false;">Get your free API key &rarr;</a>
+    <div class="section-label">Archived</div>
+    <h2>The service is off.<br>The engineering is still here.</h2>
+    <p>Backend, SDKs, MCP server, and Postgres schema are all readable in the repo.</p>
+    <a href="https://github.com/CodeAndCalories/memstore" class="btn-primary" style="font-size:16px;padding:16px 40px" target="_blank" rel="noopener">View source on GitHub &rarr;</a>
     <div class="trust-row" style="margin-top:32px">
-      <div class="trust-item"><span>Free tier</span> no card required</div>
-      <div class="trust-item"><span>5 min</span> integration</div>
-      <div class="trust-item"><span>Cancel</span> anytime</div>
+      <div class="trust-item"><span>Node.js</span> + Express</div>
+      <div class="trust-item"><span>Supabase</span> Postgres + pgvector</div>
+      <div class="trust-item"><span>Python + Node</span> SDKs</div>
     </div>
   </div>
 </section>
-
-<!-- SIGNUP MODAL -->
-<div class="modal-overlay" id="signupModal" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
-    <div id="modalForm">
-      <h3>Get your free API key</h3>
-      <p class="modal-sub">Free tier — 1,000 ops/month. No credit card required.</p>
-      <label for="modalEmail">Email address</label>
-      <input type="email" id="modalEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')submitModal()">
-      <div id="modalError" class="modal-error"></div>
-      <button class="modal-submit" id="modalSubmit" onclick="submitModal()">Get API key &rarr;</button>
-    </div>
-    <div id="modalResult" style="display:none">
-      <h3>Your API key</h3>
-      <p class="modal-sub">Your key is ready. Add it as an <code style="font-family:var(--font-mono);color:var(--brand)">Authorization: Bearer</code> header on every request.</p>
-      <div class="key-result">
-        <div class="key-warning">&#9888; Save this key — it won't be shown again.</div>
-        <div class="key-box">
-          <span class="key-text" id="keyText"></span>
-          <button class="key-copy" id="copyBtn" onclick="copyKey()">Copy</button>
-        </div>
-        <div class="key-hint">Store it in an environment variable, e.g. <code style="font-family:var(--font-mono)">MEMSTORE_API_KEY</code></div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- AI HUB SHOWCASE -->
 <section class="aihub-showcase">
@@ -1195,34 +1241,34 @@ requests.post(
     <div>
       <div class="footer-logo" style="margin-bottom:12px"><span class="logo-dot"></span>memstore.dev</div>
       <div class="footer-links">
-        <a href="#">Docs</a>
-        <a href="/guide.html">Guide</a>
-        <a href="#">Changelog</a>
-        <a href="#">GitHub</a>
-        <a href="#">Status</a>
+        <a href="guide.html">Guide</a>
+        <a href="docs/persistent-memory-ai-agents.html">Docs</a>
+        <a href="blog/langchain-memory.html">LangChain</a>
+        <a href="blog/crewai-agent-memory.html">CrewAI</a>
       </div>
     </div>
     <div>
       <div class="footer-logo" style="margin-bottom:12px">Compare</div>
       <div class="footer-links">
-        <a href="/compare/memstore-vs-mem0.html">vs Mem0</a>
-        <a href="/compare/memstore-vs-zep.html">vs Zep</a>
-        <a href="/compare/memstore-vs-pinecone.html">vs Pinecone</a>
-        <a href="/compare/memstore-vs-chromadb.html">vs ChromaDB</a>
-        <a href="/compare/memstore-vs-pgvector.html">vs pgvector</a>
+        <a href="compare/memstore-vs-mem0.html">vs Mem0</a>
+        <a href="compare/memstore-vs-zep.html">vs Zep</a>
+        <a href="compare/memstore-vs-pinecone.html">vs Pinecone</a>
+        <a href="compare/memstore-vs-chromadb.html">vs ChromaDB</a>
+        <a href="compare/memstore-vs-pgvector.html">vs pgvector</a>
       </div>
     </div>
-    <div class="footer-newsletter">
-      <p>Stay updated — new guides and API features.</p>
-      <div class="newsletter-form">
-        <input class="newsletter-input" id="nl-email" type="email" placeholder="you@example.com">
-        <button class="newsletter-btn" id="nl-btn" onclick="nlSubscribe()">Stay updated</button>
+    <div>
+      <div class="footer-logo" style="margin-bottom:12px">Project</div>
+      <div class="footer-links">
+        <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">GitHub</a>
+        <a href="quickstart.html">Quickstart</a>
+        <a href="#api">API reference</a>
+        <a href="#architecture">How it was built</a>
       </div>
-      <div class="newsletter-msg" id="nl-msg"></div>
     </div>
   </div>
   <div class="footer-bottom">
-    <div class="footer-legal">&copy; 2026 Memstore &middot; Privacy &middot; Terms</div>
+    <div class="footer-legal">&copy; 2026 Memstore &middot; Archived project &middot; <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener" style="color:var(--dim)">Source on GitHub</a></div>
   </div>
 </footer>
 
@@ -1259,136 +1305,6 @@ document.querySelectorAll('.how-card,.feat,.price-card,.endpoint').forEach((el,i
   observer.observe(el);
 });
 
-// ── Modal ──────────────────────────────────────────────────────
-function openModal(){
-  document.getElementById('signupModal').classList.add('open');
-  setTimeout(()=>document.getElementById('modalEmail').focus(),120);
-}
-
-function closeModal(){
-  document.getElementById('signupModal').classList.remove('open');
-  // reset state after transition finishes
-  setTimeout(()=>{
-    document.getElementById('modalForm').style.display='';
-    document.getElementById('modalResult').style.display='none';
-    document.getElementById('modalEmail').value='';
-    const err=document.getElementById('modalError');
-    err.style.display='none';err.textContent='';
-    const btn=document.getElementById('modalSubmit');
-    btn.disabled=false;btn.textContent='Get API key \u2192';
-  },300);
-}
-
-function closeModalOutside(e){
-  if(e.target===document.getElementById('signupModal'))closeModal();
-}
-
-async function submitModal(){
-  const emailEl=document.getElementById('modalEmail');
-  const email=emailEl.value.trim();
-  const err=document.getElementById('modalError');
-  // basic validation
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    err.textContent='Please enter a valid email address.';
-    err.style.display='block';
-    emailEl.focus();
-    return;
-  }
-  err.style.display='none';
-  const btn=document.getElementById('modalSubmit');
-  btn.disabled=true;btn.textContent='Creating your key…';
-  try{
-    const res=await fetch('/v1/agents',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:'My Agent',email})
-    });
-    const data=await res.json();
-    if(!res.ok){
-      err.textContent=data.message||'Something went wrong. Please try again.';
-      err.style.display='block';
-      btn.disabled=false;btn.textContent='Get API key \u2192';
-      return;
-    }
-    // success — show key
-    document.getElementById('keyText').textContent=data.api_key;
-    document.getElementById('modalForm').style.display='none';
-    document.getElementById('modalResult').style.display='block';
-  }catch(e){
-    err.textContent='Network error — please check your connection and try again.';
-    err.style.display='block';
-    btn.disabled=false;btn.textContent='Get API key \u2192';
-  }
-}
-
-let _copyTimer;
-function copyKey(){
-  const key=document.getElementById('keyText').textContent;
-  navigator.clipboard.writeText(key).then(()=>{
-    const btn=document.getElementById('copyBtn');
-    btn.textContent='Copied!';
-    clearTimeout(_copyTimer);
-    _copyTimer=setTimeout(()=>btn.textContent='Copy',2200);
-  }).catch(()=>{
-    // fallback for browsers without clipboard API
-    const ta=document.createElement('textarea');
-    ta.value=key;ta.style.position='fixed';ta.style.opacity='0';
-    document.body.appendChild(ta);ta.select();
-    document.execCommand('copy');document.body.removeChild(ta);
-    const btn=document.getElementById('copyBtn');
-    btn.textContent='Copied!';
-    clearTimeout(_copyTimer);
-    _copyTimer=setTimeout(()=>btn.textContent='Copy',2200);
-  });
-}
-
-// close on Escape key
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-
-// ── Newsletter ─────────────────────────────────────────────────
-async function nlSubscribe() {
-  const input = document.getElementById('nl-email');
-  const btn   = document.getElementById('nl-btn');
-  const msg   = document.getElementById('nl-msg');
-  const email = input.value.trim();
-
-  if (!email) { input.focus(); return; }
-
-  btn.disabled = true;
-  btn.textContent = '…';
-  msg.className = 'newsletter-msg';
-  msg.textContent = '';
-
-  try {
-    const res  = await fetch('/v1/newsletter/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
-
-    if (res.ok) {
-      msg.className   = 'newsletter-msg ok';
-      msg.textContent = '✓ You\'re on the list.';
-      input.value     = '';
-      btn.textContent = 'Done';
-    } else {
-      msg.className   = 'newsletter-msg err';
-      msg.textContent = data.message || 'Something went wrong.';
-      btn.disabled    = false;
-      btn.textContent = 'Stay updated';
-    }
-  } catch {
-    msg.className   = 'newsletter-msg err';
-    msg.textContent = 'Network error — try again.';
-    btn.disabled    = false;
-    btn.textContent = 'Stay updated';
-  }
-}
-
-document.getElementById('nl-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') nlSubscribe();
-});
 </script>
 </body>
 </html>
