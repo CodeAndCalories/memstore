@@ -124,8 +124,9 @@ curl "https://memstore.dev/v1/memory/recall?q=user+settings" \
 
 ## Screenshots
 
-Images live in [`screenshots/`](screenshots/) — see that folder's README for the
-capture list and conventions. The tags below render as soon as the files land.
+_Screenshots pending — capture list and conventions are in [`screenshots/`](screenshots/)._
+
+<!-- Uncomment each line as the file lands in screenshots/
 
 ### Landing page
 
@@ -150,6 +151,9 @@ capture list and conventions. The tags below render as soon as the files land.
 ### Admin dashboard
 
 ![Admin dashboard showing agents and usage](screenshots/admin-dashboard.png)
+
+-->
+
 
 ## What I learned
 

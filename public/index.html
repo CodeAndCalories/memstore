@@ -346,7 +346,7 @@ nav{top:34px}
       </div>
       <div class="trust-row">
         <div class="trust-item"><span>pgvector</span> semantic search</div>
-        <div class="trust-item"><span>&lt;50ms</span> recall latency</div>
+        <div class="trust-item"><span>Cosine</span> similarity recall</div>
         <div class="trust-item"><span>Framework</span> agnostic</div>
       </div>
     </div>
@@ -1067,7 +1067,7 @@ requests.post(
         <div class="plan-name">Free</div>
         <div class="plan-price"><sup></sup>$0</div>
         <div class="plan-period">forever</div>
-        <div style="display:inline-block;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);color:var(--green);font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin-bottom:20px">No credit card required</div>
+        <div style="display:inline-block;background:rgba(255,255,255,0.04);border:1px solid var(--border-bright);color:var(--dim);font-size:11px;font-weight:500;padding:3px 10px;border-radius:99px;margin-bottom:20px">No card was required</div>
         <ul class="plan-features">
           <li style="font-size:15px;font-weight:600;color:var(--text)">1,000 operations/month</li>
           <li>50MB memory storage</li>
@@ -1115,28 +1115,28 @@ requests.post(
     <h2>Common questions</h2>
     <div class="faq-list">
       <div class="faq-item open">
-        <div class="faq-q" onclick="toggleFaq(this)">What frameworks does Memstore work with? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">Any framework that can make HTTP requests. LangGraph, CrewAI, AutoGen, custom MCP/A2A setups, plain Python, Node.js — if it can call a REST API, it works with Memstore. No framework-specific SDK required, though we ship optional ones for Python and Node.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">What frameworks did Memstore work with? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Any framework that can make HTTP requests. LangGraph, CrewAI, AutoGen, custom MCP/A2A setups, plain Python, Node.js — if it could call a REST API, it worked with Memstore. No framework-specific SDK was required, though optional Python and Node clients shipped alongside it.</div></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How is this different from just using Supabase directly? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">Memstore handles embedding generation, index management, TTL enforcement, session scoping, memory summarization, and usage metering out of the box. Using Supabase raw requires you to wire all of that yourself — embedding model calls, vector index tuning, cleanup jobs. Memstore is the "it just works" layer so you ship your agent, not your infrastructure.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">How was this different from using Supabase directly? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Memstore handled embedding generation, index management, TTL enforcement, session scoping, and usage metering behind two endpoints. Using Supabase directly means wiring all of that yourself — embedding calls, vector index tuning, cleanup jobs. Memstore was the layer that absorbed it.</div></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What embedding model does it use? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">We use OpenAI text-embedding-3-small by default (1536 dimensions, excellent performance/cost ratio). Pro tier can switch to text-embedding-3-large for higher recall accuracy on complex semantic queries.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">What embedding model did it use? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">OpenAI text-embedding-3-small (1536 dimensions), chosen for its cost/quality ratio. The Pro tier was designed to switch to text-embedding-3-large for higher recall accuracy on complex queries.</div></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How do I count an "operation"? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">Each API call counts as one operation — one remember, one recall, one forget, or one list. A summarize call counts as one operation regardless of how many memories it compresses. We log all usage in your dashboard in real time.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">How was an "operation" counted? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Each API call counted as one operation — one remember, recall, forget, or list — metered per agent against the plan quota.</div></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Is my agent's data private? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">Yes. Each API key is scoped to an isolated agent namespace. No memory is shared between different API keys. Data is encrypted at rest. We never use your agent's memory data to train any models.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">How was agent data isolated? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Each API key was scoped to an isolated agent namespace, and every query filtered on agent_id inside the SQL function itself, so no memory was reachable across keys. Stored data was never used to train models.</div></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What happens if I exceed my operation limit? <span class="faq-icon">+</span></div>
-        <div class="faq-a"><div class="faq-a-inner">Recall operations continue to work (read-only). New remember calls return a 429 with a clear JSON error your agent can parse. We'll email you at 80% usage so you can upgrade before hitting the limit.</div></div>
+        <div class="faq-q" onclick="toggleFaq(this)">What happened when an operation limit was reached? <span class="faq-icon">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Recall kept working read-only, while new remember calls returned a 429 with a JSON error an agent could parse rather than a bare status code. A usage alert fired once at 80% of quota.</div></div>
       </div>
     </div>
   </div>
@@ -1147,27 +1147,27 @@ requests.post(
   <div class="container">
     <div class="section-label">Security</div>
     <h2>Your data stays yours</h2>
-    <p class="section-sub">Agent memory contains sensitive data. Memstore is built with privacy as a default.</p>
+    <p class="section-sub">Agent memory holds sensitive data, so these were the guarantees the service was designed around.</p>
     <div class="features-grid" style="margin-top:48px">
       <div class="feat">
         <div class="feat-icon icon-teal">&#128274;</div>
         <h3>Encrypted in transit and at rest</h3>
-        <p>All memories are encrypted at rest and transmitted over TLS. Your data never moves over unencrypted channels.</p>
+        <p>Memories were stored in Postgres with encryption at rest and served over TLS only.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-purple">&#127757;</div>
         <h3>Isolated namespaces</h3>
-        <p>Every API key operates in a fully isolated namespace. Your agent's memories are never mixed with other accounts or used to train any models.</p>
+        <p>Every API key operated in its own namespace. Isolation was enforced in the recall SQL function, not just the application layer.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-amber">&#128230;</div>
-        <h3>Your data belongs to you</h3>
-        <p>We never use your stored memories or queries to train models. Export or delete your data at any time via the API.</p>
+        <h3>Data stayed yours</h3>
+        <p>Stored memories and queries were never used to train models. The list and forget endpoints made export and deletion self-service.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-green">&#128273;</div>
-        <h3>Revoke keys instantly</h3>
-        <p>Rotate or revoke API keys at any time. Each key is scoped to a single agent namespace with no cross-account access.</p>
+        <h3>Revocable keys</h3>
+        <p>Keys were bcrypt-hashed and could be rotated or revoked, each scoped to a single agent namespace.</p>
       </div>
     </div>
   </div>

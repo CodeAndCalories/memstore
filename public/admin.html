@@ -35,6 +35,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-si
 .lock-card button{width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;font-family:var(--font-body);transition:background .2s}
 .lock-card button:hover{background:#9080FF}
 .lock-error{color:var(--red);font-size:13px;margin-top:10px;min-height:18px}
+.backend-notice{text-align:left;background:var(--bg2);border:1px solid var(--border-bright);border-left:2px solid var(--amber,#F59E0B);border-radius:8px;padding:14px 16px;font-size:12.5px;line-height:1.65;color:var(--muted);margin-bottom:20px}
+.backend-notice strong{display:block;color:var(--text);font-weight:600;margin-bottom:4px}
+.backend-notice code{font-family:var(--font-mono);font-size:11.5px;color:var(--text);background:var(--bg3,#13131F);padding:1px 4px;border-radius:3px}
+.backend-notice a{display:inline-block;margin-top:8px;color:var(--brand);text-decoration:none}
+.backend-notice a:hover{text-decoration:underline}
+.lock-card p code{font-family:var(--font-mono);font-size:12.5px;color:var(--text)}
 
 /* top bar */
 header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
@@ -134,8 +140,17 @@ nav{top:34px}
   <div class="lock-card">
     <div class="lock-logo"><img src="logo.svg" alt="memstore" height="32"></div>
     <h2>Admin Dashboard</h2>
-    <p>Enter the admin password to continue.</p>
-    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+    <div class="backend-notice">
+      <strong>Requires a running backend.</strong>
+      This dashboard is reference UI from an archived project. It reads from
+      <code>GET /v1/admin/agents</code>, which is not served by this static site &mdash; the
+      hosted API was shut down. It works only if you clone the repo and run
+      <code>backend/server.js</code> against your own Supabase project, authenticating with
+      your own <code>ADMIN_TOKEN</code>.
+      <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">View the source</a>
+    </div>
+    <p>Enter your <code>ADMIN_TOKEN</code> to continue.</p>
+    <input type="password" id="pw-input" placeholder="ADMIN_TOKEN" autocomplete="current-password">
     <button onclick="unlock()">Unlock &rarr;</button>
     <div class="lock-error" id="lock-error"></div>
   </div>
@@ -224,9 +239,17 @@ async function unlock() {
     });
 
     if (res.status === 401) {
-      document.getElementById('lock-error').textContent = 'Incorrect password.';
+      document.getElementById('lock-error').textContent = 'Incorrect token.';
       document.getElementById('pw-input').value = '';
       document.getElementById('pw-input').focus();
+      return;
+    }
+
+    // No backend behind this page (e.g. the static archive) — say so plainly
+    // rather than failing later on a non-JSON response.
+    if (!res.ok) {
+      document.getElementById('lock-error').textContent =
+        'No backend is running at /v1/admin/agents — this is the static archive.';
       return;
     }
 
@@ -244,7 +267,8 @@ async function unlock() {
       'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   } catch (err) {
-    document.getElementById('lock-error').textContent = 'Network error — is the server running?';
+    document.getElementById('lock-error').textContent =
+      'Could not reach the API — this dashboard needs backend/server.js running locally.';
   } finally {
     btn.textContent = 'Unlock →';
     btn.disabled = false;
