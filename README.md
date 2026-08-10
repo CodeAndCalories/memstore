@@ -124,13 +124,32 @@ curl "https://memstore.dev/v1/memory/recall?q=user+settings" \
 
 ## Screenshots
 
-_Placeholder — capture list and conventions are in [`public/screenshots/screenshots-needed.md`](public/screenshots/screenshots-needed.md). Drop PNGs into `public/screenshots/` and link them here._
+Images live in [`screenshots/`](screenshots/) — see that folder's README for the
+capture list and conventions. The tags below render as soon as the files land.
 
-| | |
-|---|---|
-| `landing-hero.png` — homepage | `quickstart-docs.png` — quickstart |
-| `terminal-curl.png` — remember/recall round trip | `python-sdk.png` — three-line SDK example |
-| `mcp-claude-desktop.png` — MCP tools in Claude Desktop | `admin-dashboard.png` — usage dashboard |
+### Landing page
+
+![Memstore landing page](screenshots/landing-hero.png)
+
+### Documentation
+
+![Quickstart docs](screenshots/quickstart-docs.png)
+
+![API reference](screenshots/api-reference.png)
+
+### The API in use
+
+![remember and recall round trip in a terminal](screenshots/terminal-curl.png)
+
+![Python SDK example](screenshots/python-sdk.png)
+
+### MCP server in Claude Desktop
+
+![Memstore MCP tools listed in Claude Desktop](screenshots/mcp-claude-desktop.png)
+
+### Admin dashboard
+
+![Admin dashboard showing agents and usage](screenshots/admin-dashboard.png)
 
 ## What I learned
 
