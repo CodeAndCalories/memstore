@@ -303,7 +303,7 @@ nav{top:34px}
   <span>Archived project &mdash; the hosted API is no longer running. <a href="https://github.com/CodeAndCalories/memstore" target="_blank" rel="noopener">Source code</a> and full docs remain available.</span>
 </div>
 <nav>
-  <a href="#" class="nav-logo"><img src="logo.svg" alt="memstore" height="32"></a>
+  <a href="index.html" class="nav-logo"><img src="logo.svg" alt="memstore" height="32"></a>
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#api">API</a>
@@ -322,8 +322,8 @@ nav{top:34px}
         <a href="blog/vector-database-ai-agents.html">Vector databases explained</a>
       </div>
     </div>
-    <a href="#" style="font-family:var(--font-mono);font-size:13px">Docs</a>
-    <a href="mailto:austin@memstore.dev" style="font-family:var(--font-mono);font-size:13px">Contact</a>
+    <a href="docs/persistent-memory-ai-agents.html" style="font-family:var(--font-mono);font-size:13px">Docs</a>
+    <a href="mailto:hello@memstore.dev" style="font-family:var(--font-mono);font-size:13px">Contact</a>
   </div>
   <a href="https://github.com/CodeAndCalories/memstore" class="nav-cta" target="_blank" rel="noopener">View source on GitHub</a>
 </nav>
@@ -356,12 +356,12 @@ nav{top:34px}
       <div class="browser">
         <div class="browser-bar">
           <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
-          <div class="url-bar">api.memstore.dev/v1/memory</div>
+          <div class="url-bar">memstore.dev/v1/memory</div>
         </div>
         <div class="code-split">
           <div class="code-panel" data-cw>
             <div class="panel-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span>Store a memory</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-            <pre><span class="kw">const</span> <span class="fn">res</span> = <span class="kw">await</span> fetch(<span class="str">'https://api.memstore.dev</span>
+            <pre><span class="kw">const</span> <span class="fn">res</span> = <span class="kw">await</span> fetch(<span class="str">'https://memstore.dev</span>
 <span class="str">  /v1/memory/remember'</span>, {
   <span class="key">method</span>: <span class="str">'POST'</span>,
   <span class="key">headers</span>: {
@@ -777,7 +777,7 @@ $$;</pre>
 <section id="how" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="container">
     <div class="section-label">How it works</div>
-    <h2>Three calls.<br>Infinite memory.</h2>
+    <h2>Three calls.<br>Memory that survived the run.</h2>
     <div class="how-grid">
       <div class="how-card">
         <span class="step-num">01</span>
@@ -805,37 +805,32 @@ $$;</pre>
   <div class="container">
     <div class="section-label">Built for production agents</div>
     <h2>What your agent needs<br>to remember</h2>
-    <p class="section-sub">Not a vector DB tutorial. A production-grade memory layer with agent-native primitives.</p>
+    <p class="section-sub">Not a vector DB tutorial — a memory layer with agent-native primitives.</p>
     <div class="features-grid">
       <div class="feat">
         <div class="feat-icon icon-purple">&#9670;</div>
         <h3>Semantic recall</h3>
-        <p>pgvector cosine similarity search returns the right memories even when the query wording differs. Agents don't need exact matches to remember.</p>
+        <p>pgvector cosine similarity returned the right memories even when the query wording differed. Agents did not need exact matches to remember.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-teal">&#9632;</div>
         <h3>Session isolation</h3>
-        <p>Tag memories by user, task, or run. Recall across sessions or within a single scope. No cross-contamination between different agent contexts.</p>
+        <p>Memories were tagged by user, task, or run, and recall could span sessions or stay inside a single scope. Isolation was enforced in the SQL, not just the app layer.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-amber">&#9650;</div>
         <h3>TTL + auto-expiry</h3>
-        <p>Set time-to-live on any memory. Short-lived task context expires automatically. Long-term user facts persist forever. You control the lifecycle.</p>
+        <p>Any memory could carry a time-to-live. Short-lived task context expired on its own; long-term facts persisted. Expiry was filtered inside the recall query itself.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-green">&#9679;</div>
         <h3>LLM-parseable errors</h3>
-        <p>Every error response includes a machine-readable code, human-readable message, and a suggested fix. Agents retry correctly without human intervention.</p>
-      </div>
-      <div class="feat">
-        <div class="feat-icon icon-teal">&#9632;</div>
-        <h3>Memory summarization</h3>
-        <p>Pro tier automatically compresses aging memories into dense summaries. Slash token costs by 40–50% without losing long-term context.</p>
+        <p>Every error response carried a machine-readable code, a human-readable message, and a suggested fix, so an agent could retry correctly without a human in the loop.</p>
       </div>
       <div class="feat">
         <div class="feat-icon icon-purple">&#9670;</div>
         <h3>Webhooks on update</h3>
-        <p>Fire webhooks when memories are created, updated, or expire. Sync agent state across services or trigger downstream actions when context changes.</p>
+        <p>Webhooks fired when memories were created, updated, or expired, so agent state could be synced across services or trigger downstream work.</p>
       </div>
     </div>
   </div>
@@ -846,27 +841,27 @@ $$;</pre>
   <div class="container">
     <div class="section-label">Use cases</div>
     <h2>Built for every<br>agent type</h2>
-    <p class="section-sub">From customer-facing bots to internal automation pipelines.</p>
+    <p class="section-sub">What it was used for, from customer-facing bots to internal automation pipelines.</p>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:64px" class="use-grid">
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
         <div style="font-size:28px;margin-bottom:16px">🎧</div>
         <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Customer support bots</h3>
-        <p style="font-size:14px;color:var(--muted);line-height:1.7">Remember each customer's history, past tickets, and preferences. Resolve issues faster without making customers repeat themselves every time.</p>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Bots that recalled a customer's history, past tickets, and preferences, so nobody had to repeat themselves on every contact.</p>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
         <div style="font-size:28px;margin-bottom:16px">💼</div>
         <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Sales &amp; outreach agents</h3>
-        <p style="font-size:14px;color:var(--muted);line-height:1.7">Track every prospect interaction, objection, and follow-up. Agents remember deal context across weeks of back-and-forth.</p>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Agents that tracked every prospect interaction, objection, and follow-up, holding deal context across weeks of back-and-forth.</p>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
         <div style="font-size:28px;margin-bottom:16px">🤖</div>
         <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Personal AI assistants</h3>
-        <p style="font-size:14px;color:var(--muted);line-height:1.7">Build assistants that genuinely know the user — their preferences, projects, habits, and goals — getting more useful with every interaction.</p>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">Assistants that actually knew the user — preferences, projects, habits, goals — and got more useful with each interaction.</p>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px">
         <div style="font-size:28px;margin-bottom:16px">🔗</div>
         <h3 style="font-size:18px;font-weight:600;margin-bottom:10px">Multi-agent pipelines</h3>
-        <p style="font-size:14px;color:var(--muted);line-height:1.7">Share state across agent handoffs. One agent stores a decision; another recalls it 10 steps later — no message-passing spaghetti.</p>
+        <p style="font-size:14px;color:var(--muted);line-height:1.7">State shared across agent handoffs: one agent stored a decision, another recalled it ten steps later, with no message-passing spaghetti.</p>
       </div>
     </div>
   </div>
@@ -877,7 +872,7 @@ $$;</pre>
   <div class="container">
     <div class="section-label">Integrations</div>
     <h2>Works with your<br>existing stack</h2>
-    <p class="section-sub">No SDK required. Any language that can make an HTTP request works with Memstore.</p>
+    <p class="section-sub">No SDK required — any language that could make an HTTP request worked with Memstore.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px" class="try-grid">
       <div data-cw style="background:var(--surface);border:1px solid rgba(123,110,246,0.4);border-radius:var(--radius);overflow:hidden">
         <div style="background:var(--bg3);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
@@ -950,7 +945,7 @@ requests.post(
       <div style="background:var(--bg2);padding:32px;border-top:1px solid var(--border)">
         <div style="font-family:var(--font-mono);font-size:28px;color:var(--brand);margin-bottom:16px">06</div>
         <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--brand)">Or just use Memstore</h3>
-        <p style="font-size:13px;color:var(--muted);line-height:1.6">Two REST calls. Done in an afternoon. Focus on your agent's actual intelligence, not infrastructure plumbing.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Two REST calls, done in an afternoon — the point was to spend the time on the agent, not the plumbing.</p>
       </div>
     </div>
   </div>
@@ -961,7 +956,7 @@ requests.post(
   <div class="container">
     <div class="section-label">Why Memstore</div>
     <h2>Stop building infrastructure.<br><em>Start building agents.</em></h2>
-    <p class="section-sub">Every alternative requires weeks of setup, ongoing maintenance, and specialized knowledge.</p>
+    <p class="section-sub">How the alternatives compared at the time Memstore was running.</p>
     <div class="cmp-wrap">
       <table class="cmp-table">
         <thead>
@@ -969,7 +964,7 @@ requests.post(
             <th>Feature</th>
             <th>Self-hosted pgvector</th>
             <th>Pinecone / Weaviate</th>
-            <th class="col-ms">Memstore</th>
+            <th class="col-ms">Memstore (as built)</th>
           </tr>
         </thead>
         <tbody>
@@ -977,7 +972,7 @@ requests.post(
             <td class="feat-col">Setup time</td>
             <td>2–4 hours</td>
             <td>~1 hour</td>
-            <td class="col-ms">Under 5 minutes</td>
+            <td class="col-ms">Minutes, once you had a key</td>
           </tr>
           <tr>
             <td class="feat-col">Embedding logic</td>
@@ -989,7 +984,7 @@ requests.post(
             <td class="feat-col">Maintenance</td>
             <td>High</td>
             <td>Medium</td>
-            <td class="col-ms">None</td>
+            <td class="col-ms">Handled by the service</td>
           </tr>
           <tr>
             <td class="feat-col">API style</td>
@@ -1001,7 +996,7 @@ requests.post(
             <td class="feat-col">Cost to start</td>
             <td>$25+/mo</td>
             <td>Usage + fees</td>
-            <td class="col-ms">Free</td>
+            <td class="col-ms">Free tier, then $19/mo</td>
           </tr>
         </tbody>
       </table>
@@ -1015,14 +1010,13 @@ requests.post(
     <div class="schema-wrap">
       <div class="schema-desc">
         <div class="section-label">The API</div>
-        <h2>Ship memory in minutes</h2>
-        <p>Five endpoints. Bearer auth. JSON in, JSON out. Structured errors your agent can actually act on. No SDK required — though we have one.</p>
+        <h2>The whole API surface</h2>
+        <p>Four endpoints. Bearer auth. JSON in, JSON out. Structured errors an agent could act on. No SDK was required, though Python and Node clients shipped alongside it.</p>
         <div class="endpoint-list">
           <div class="endpoint"><span class="method m-post">POST</span><span class="path">/v1/memory/remember</span></div>
           <div class="endpoint"><span class="method m-get">GET</span><span class="path">/v1/memory/recall?q=...</span></div>
           <div class="endpoint"><span class="method m-del">DEL</span><span class="path">/v1/memory/forget/:id</span></div>
           <div class="endpoint"><span class="method m-get">GET</span><span class="path">/v1/memory/list</span></div>
-          <div class="endpoint"><span class="method m-post">POST</span><span class="path">/v1/memory/summarize</span></div>
         </div>
       </div>
       <div class="schema-code">
@@ -1097,7 +1091,6 @@ requests.post(
         <ul class="plan-features">
           <li>500,000 operations/month</li>
           <li>10GB memory storage</li>
-          <li>Auto memory summarization</li>
           <li>Priority support</li>
           <li>Custom TTL policies</li>
           <li>Usage analytics</li>

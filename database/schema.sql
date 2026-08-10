@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS memories (
 CREATE TABLE IF NOT EXISTS usage_log (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id    UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
-  operation   TEXT NOT NULL,                 -- remember | recall | forget | list | summarize
+  operation   TEXT NOT NULL,                 -- remember | recall | forget | list
   tokens_used INTEGER DEFAULT 0,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
